@@ -94,7 +94,6 @@ int main(int argc, char** argv) {
     pr->set_store_id(std::atoi(argv[5]));
     confChange.set_allocated_peer(pr);
     raftClient->PeerConfChange(std::string(argv[1]), confChange);
-
   } else if (reqType == "split") {
     //
     raft_cmdpb::SplitRequest splitReuest;

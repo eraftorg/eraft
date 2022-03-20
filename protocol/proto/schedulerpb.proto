@@ -31,7 +31,7 @@ service Scheduler {
 
     rpc StoreHeartbeat(StoreHeartbeatRequest) returns (StoreHeartbeatResponse) {}
 
-    rpc RegionHeartbeat(stream RegionHeartbeatRequest) returns (stream RegionHeartbeatResponse) {}
+    rpc RegionHeartbeat(RegionHeartbeatRequest) returns (RegionHeartbeatResponse) {}
 
     rpc GetRegion(GetRegionRequest) returns (GetRegionResponse) {}
 
