@@ -1,0 +1,60 @@
+version: '3'
+services:
+  eraft-1:
+    hostname: eraft-1
+    image: eraft/eraft_dev:v0.5
+    volumes:
+      - .:/eraft
+    working_dir: /eraft
+    command: build_/kv/kvserver/kv_svr 172.19.0.11:20160 /tmp/db1 1
+    networks:
+      eraft-network:
+        ipv4_address: 172.19.0.11
+    ports:
+      - "20160:20160"
+
+  eraft-2:
+    hostname: eraft-2
+    image: eraft/eraft_dev:v0.5
+    volumes:
+      - .:/eraft
+    working_dir: /eraft
+    command: build_/kv/kvserver/kv_svr 172.19.0.12:20161 /tmp/db2 2
+    networks:
+      eraft-network:
+        ipv4_address: 172.19.0.12
+    ports:
+      - "20161:20161"
+
+  eraft-3:
+    hostname: eraft-3
+    image: eraft/eraft_dev:v0.5
+    volumes:
+      - .:/eraft
+    working_dir: /eraft
+    command: build_/kv/kvserver/kv_svr 172.19.0.13:20162 /tmp/db3 3
+    networks:
+      eraft-network:
+        ipv4_address: 172.19.0.13
+    ports:
+      - "20162:20162"
+
+  eraft-4:
+    hostname: eraft-4
+    image: eraft/eraft_dev:v0.5
+    volumes:
+      - .:/eraft
+    working_dir: /eraft
+    command: build_/kv/kvserver/kv_svr 172.19.0.14:20163 /tmp/db4 4
+    networks:
+      eraft-network:
+        ipv4_address: 172.19.0.14
+    ports:
+      - "20163:20163"
+
+networks:
+  eraft-network:
+    ipam:
+      config:
+        - subnet: 172.19.0.0/16
+          gateway: 172.19.0.1
