@@ -8,4 +8,4 @@ image:
 build-dev:
 	chmod +x build-test.sh
 	# This images is pull from my(LiuJ) docker hub, you can build with the Dockerfile by youself.
-	docker run --rm -v $(realpath ..):/eraft eraft/eraft_dev:v0.4 /eraft/ci/build-test.sh;
+	docker run --rm -v $(realpath ..):/eraft eraft/eraft_dev:v0.5 /eraft/ci/build-test.sh;
