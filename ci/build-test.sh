@@ -6,8 +6,8 @@ SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 SRCPATH=$(cd $SCRIPTPATH/..; pwd -P)
 NPROC=$(nproc || grep -c ^processor /proc/cpuinfo)
 
-if [ -d "$SRCPATH/Protocol" ]; then
-  cd "$SRCPATH/Protocol"
+if [ -d "$SRCPATH/protocol" ]; then
+  cd "$SRCPATH/protocol"
   chmod -R 755 scripts
   ./scripts/generate_cpp.sh
   cd -

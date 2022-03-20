@@ -113,14 +113,12 @@ class Scheduler final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::schedulerpb::StoreHeartbeatResponse>> PrepareAsyncStoreHeartbeat(::grpc::ClientContext* context, const ::schedulerpb::StoreHeartbeatRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::schedulerpb::StoreHeartbeatResponse>>(PrepareAsyncStoreHeartbeatRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientReaderWriterInterface< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>> RegionHeartbeat(::grpc::ClientContext* context) {
-      return std::unique_ptr< ::grpc::ClientReaderWriterInterface< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>>(RegionHeartbeatRaw(context));
+    virtual ::grpc::Status RegionHeartbeat(::grpc::ClientContext* context, const ::schedulerpb::RegionHeartbeatRequest& request, ::schedulerpb::RegionHeartbeatResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::schedulerpb::RegionHeartbeatResponse>> AsyncRegionHeartbeat(::grpc::ClientContext* context, const ::schedulerpb::RegionHeartbeatRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::schedulerpb::RegionHeartbeatResponse>>(AsyncRegionHeartbeatRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>> AsyncRegionHeartbeat(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>>(AsyncRegionHeartbeatRaw(context, cq, tag));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>> PrepareAsyncRegionHeartbeat(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>>(PrepareAsyncRegionHeartbeatRaw(context, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::schedulerpb::RegionHeartbeatResponse>> PrepareAsyncRegionHeartbeat(::grpc::ClientContext* context, const ::schedulerpb::RegionHeartbeatRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::schedulerpb::RegionHeartbeatResponse>>(PrepareAsyncRegionHeartbeatRaw(context, request, cq));
     }
     virtual ::grpc::Status GetRegion(::grpc::ClientContext* context, const ::schedulerpb::GetRegionRequest& request, ::schedulerpb::GetRegionResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::schedulerpb::GetRegionResponse>> AsyncGetRegion(::grpc::ClientContext* context, const ::schedulerpb::GetRegionRequest& request, ::grpc::CompletionQueue* cq) {
@@ -237,7 +235,10 @@ class Scheduler final {
       virtual void StoreHeartbeat(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::schedulerpb::StoreHeartbeatResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void StoreHeartbeat(::grpc::ClientContext* context, const ::schedulerpb::StoreHeartbeatRequest* request, ::schedulerpb::StoreHeartbeatResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void StoreHeartbeat(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::schedulerpb::StoreHeartbeatResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
-      virtual void RegionHeartbeat(::grpc::ClientContext* context, ::grpc::experimental::ClientBidiReactor< ::schedulerpb::RegionHeartbeatRequest,::schedulerpb::RegionHeartbeatResponse>* reactor) = 0;
+      virtual void RegionHeartbeat(::grpc::ClientContext* context, const ::schedulerpb::RegionHeartbeatRequest* request, ::schedulerpb::RegionHeartbeatResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void RegionHeartbeat(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::schedulerpb::RegionHeartbeatResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void RegionHeartbeat(::grpc::ClientContext* context, const ::schedulerpb::RegionHeartbeatRequest* request, ::schedulerpb::RegionHeartbeatResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void RegionHeartbeat(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::schedulerpb::RegionHeartbeatResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetRegion(::grpc::ClientContext* context, const ::schedulerpb::GetRegionRequest* request, ::schedulerpb::GetRegionResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetRegion(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::schedulerpb::GetRegionResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetRegion(::grpc::ClientContext* context, const ::schedulerpb::GetRegionRequest* request, ::schedulerpb::GetRegionResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
@@ -304,9 +305,8 @@ class Scheduler final {
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::schedulerpb::GetAllStoresResponse>* PrepareAsyncGetAllStoresRaw(::grpc::ClientContext* context, const ::schedulerpb::GetAllStoresRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::schedulerpb::StoreHeartbeatResponse>* AsyncStoreHeartbeatRaw(::grpc::ClientContext* context, const ::schedulerpb::StoreHeartbeatRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::schedulerpb::StoreHeartbeatResponse>* PrepareAsyncStoreHeartbeatRaw(::grpc::ClientContext* context, const ::schedulerpb::StoreHeartbeatRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientReaderWriterInterface< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>* RegionHeartbeatRaw(::grpc::ClientContext* context) = 0;
-    virtual ::grpc::ClientAsyncReaderWriterInterface< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>* AsyncRegionHeartbeatRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) = 0;
-    virtual ::grpc::ClientAsyncReaderWriterInterface< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>* PrepareAsyncRegionHeartbeatRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::schedulerpb::RegionHeartbeatResponse>* AsyncRegionHeartbeatRaw(::grpc::ClientContext* context, const ::schedulerpb::RegionHeartbeatRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::schedulerpb::RegionHeartbeatResponse>* PrepareAsyncRegionHeartbeatRaw(::grpc::ClientContext* context, const ::schedulerpb::RegionHeartbeatRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::schedulerpb::GetRegionResponse>* AsyncGetRegionRaw(::grpc::ClientContext* context, const ::schedulerpb::GetRegionRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::schedulerpb::GetRegionResponse>* PrepareAsyncGetRegionRaw(::grpc::ClientContext* context, const ::schedulerpb::GetRegionRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::schedulerpb::GetRegionResponse>* AsyncGetPrevRegionRaw(::grpc::ClientContext* context, const ::schedulerpb::GetRegionRequest& request, ::grpc::CompletionQueue* cq) = 0;
@@ -398,14 +398,12 @@ class Scheduler final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::schedulerpb::StoreHeartbeatResponse>> PrepareAsyncStoreHeartbeat(::grpc::ClientContext* context, const ::schedulerpb::StoreHeartbeatRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::schedulerpb::StoreHeartbeatResponse>>(PrepareAsyncStoreHeartbeatRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientReaderWriter< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>> RegionHeartbeat(::grpc::ClientContext* context) {
-      return std::unique_ptr< ::grpc::ClientReaderWriter< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>>(RegionHeartbeatRaw(context));
+    ::grpc::Status RegionHeartbeat(::grpc::ClientContext* context, const ::schedulerpb::RegionHeartbeatRequest& request, ::schedulerpb::RegionHeartbeatResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::schedulerpb::RegionHeartbeatResponse>> AsyncRegionHeartbeat(::grpc::ClientContext* context, const ::schedulerpb::RegionHeartbeatRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::schedulerpb::RegionHeartbeatResponse>>(AsyncRegionHeartbeatRaw(context, request, cq));
     }
-    std::unique_ptr<  ::grpc::ClientAsyncReaderWriter< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>> AsyncRegionHeartbeat(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderWriter< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>>(AsyncRegionHeartbeatRaw(context, cq, tag));
-    }
-    std::unique_ptr<  ::grpc::ClientAsyncReaderWriter< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>> PrepareAsyncRegionHeartbeat(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderWriter< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>>(PrepareAsyncRegionHeartbeatRaw(context, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::schedulerpb::RegionHeartbeatResponse>> PrepareAsyncRegionHeartbeat(::grpc::ClientContext* context, const ::schedulerpb::RegionHeartbeatRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::schedulerpb::RegionHeartbeatResponse>>(PrepareAsyncRegionHeartbeatRaw(context, request, cq));
     }
     ::grpc::Status GetRegion(::grpc::ClientContext* context, const ::schedulerpb::GetRegionRequest& request, ::schedulerpb::GetRegionResponse* response) override;
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::schedulerpb::GetRegionResponse>> AsyncGetRegion(::grpc::ClientContext* context, const ::schedulerpb::GetRegionRequest& request, ::grpc::CompletionQueue* cq) {
@@ -520,7 +518,10 @@ class Scheduler final {
       void StoreHeartbeat(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::schedulerpb::StoreHeartbeatResponse* response, std::function<void(::grpc::Status)>) override;
       void StoreHeartbeat(::grpc::ClientContext* context, const ::schedulerpb::StoreHeartbeatRequest* request, ::schedulerpb::StoreHeartbeatResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       void StoreHeartbeat(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::schedulerpb::StoreHeartbeatResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
-      void RegionHeartbeat(::grpc::ClientContext* context, ::grpc::experimental::ClientBidiReactor< ::schedulerpb::RegionHeartbeatRequest,::schedulerpb::RegionHeartbeatResponse>* reactor) override;
+      void RegionHeartbeat(::grpc::ClientContext* context, const ::schedulerpb::RegionHeartbeatRequest* request, ::schedulerpb::RegionHeartbeatResponse* response, std::function<void(::grpc::Status)>) override;
+      void RegionHeartbeat(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::schedulerpb::RegionHeartbeatResponse* response, std::function<void(::grpc::Status)>) override;
+      void RegionHeartbeat(::grpc::ClientContext* context, const ::schedulerpb::RegionHeartbeatRequest* request, ::schedulerpb::RegionHeartbeatResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void RegionHeartbeat(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::schedulerpb::RegionHeartbeatResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       void GetRegion(::grpc::ClientContext* context, const ::schedulerpb::GetRegionRequest* request, ::schedulerpb::GetRegionResponse* response, std::function<void(::grpc::Status)>) override;
       void GetRegion(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::schedulerpb::GetRegionResponse* response, std::function<void(::grpc::Status)>) override;
       void GetRegion(::grpc::ClientContext* context, const ::schedulerpb::GetRegionRequest* request, ::schedulerpb::GetRegionResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
@@ -595,9 +596,8 @@ class Scheduler final {
     ::grpc::ClientAsyncResponseReader< ::schedulerpb::GetAllStoresResponse>* PrepareAsyncGetAllStoresRaw(::grpc::ClientContext* context, const ::schedulerpb::GetAllStoresRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::schedulerpb::StoreHeartbeatResponse>* AsyncStoreHeartbeatRaw(::grpc::ClientContext* context, const ::schedulerpb::StoreHeartbeatRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::schedulerpb::StoreHeartbeatResponse>* PrepareAsyncStoreHeartbeatRaw(::grpc::ClientContext* context, const ::schedulerpb::StoreHeartbeatRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientReaderWriter< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>* RegionHeartbeatRaw(::grpc::ClientContext* context) override;
-    ::grpc::ClientAsyncReaderWriter< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>* AsyncRegionHeartbeatRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) override;
-    ::grpc::ClientAsyncReaderWriter< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>* PrepareAsyncRegionHeartbeatRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::schedulerpb::RegionHeartbeatResponse>* AsyncRegionHeartbeatRaw(::grpc::ClientContext* context, const ::schedulerpb::RegionHeartbeatRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::schedulerpb::RegionHeartbeatResponse>* PrepareAsyncRegionHeartbeatRaw(::grpc::ClientContext* context, const ::schedulerpb::RegionHeartbeatRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::schedulerpb::GetRegionResponse>* AsyncGetRegionRaw(::grpc::ClientContext* context, const ::schedulerpb::GetRegionRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::schedulerpb::GetRegionResponse>* PrepareAsyncGetRegionRaw(::grpc::ClientContext* context, const ::schedulerpb::GetRegionRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::schedulerpb::GetRegionResponse>* AsyncGetPrevRegionRaw(::grpc::ClientContext* context, const ::schedulerpb::GetRegionRequest& request, ::grpc::CompletionQueue* cq) override;
@@ -659,7 +659,7 @@ class Scheduler final {
     virtual ::grpc::Status PutStore(::grpc::ServerContext* context, const ::schedulerpb::PutStoreRequest* request, ::schedulerpb::PutStoreResponse* response);
     virtual ::grpc::Status GetAllStores(::grpc::ServerContext* context, const ::schedulerpb::GetAllStoresRequest* request, ::schedulerpb::GetAllStoresResponse* response);
     virtual ::grpc::Status StoreHeartbeat(::grpc::ServerContext* context, const ::schedulerpb::StoreHeartbeatRequest* request, ::schedulerpb::StoreHeartbeatResponse* response);
-    virtual ::grpc::Status RegionHeartbeat(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::schedulerpb::RegionHeartbeatResponse, ::schedulerpb::RegionHeartbeatRequest>* stream);
+    virtual ::grpc::Status RegionHeartbeat(::grpc::ServerContext* context, const ::schedulerpb::RegionHeartbeatRequest* request, ::schedulerpb::RegionHeartbeatResponse* response);
     virtual ::grpc::Status GetRegion(::grpc::ServerContext* context, const ::schedulerpb::GetRegionRequest* request, ::schedulerpb::GetRegionResponse* response);
     virtual ::grpc::Status GetPrevRegion(::grpc::ServerContext* context, const ::schedulerpb::GetRegionRequest* request, ::schedulerpb::GetRegionResponse* response);
     virtual ::grpc::Status GetRegionByID(::grpc::ServerContext* context, const ::schedulerpb::GetRegionByIDRequest* request, ::schedulerpb::GetRegionResponse* response);
@@ -864,12 +864,12 @@ class Scheduler final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status RegionHeartbeat(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::schedulerpb::RegionHeartbeatResponse, ::schedulerpb::RegionHeartbeatRequest>* /*stream*/)  override {
+    ::grpc::Status RegionHeartbeat(::grpc::ServerContext* /*context*/, const ::schedulerpb::RegionHeartbeatRequest* /*request*/, ::schedulerpb::RegionHeartbeatResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestRegionHeartbeat(::grpc::ServerContext* context, ::grpc::ServerAsyncReaderWriter< ::schedulerpb::RegionHeartbeatResponse, ::schedulerpb::RegionHeartbeatRequest>* stream, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncBidiStreaming(9, context, stream, new_call_cq, notification_cq, tag);
+    void RequestRegionHeartbeat(::grpc::ServerContext* context, ::schedulerpb::RegionHeartbeatRequest* request, ::grpc::ServerAsyncResponseWriter< ::schedulerpb::RegionHeartbeatResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(9, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -1370,20 +1370,29 @@ class Scheduler final {
    public:
     ExperimentalWithCallbackMethod_RegionHeartbeat() {
       ::grpc::Service::experimental().MarkMethodCallback(9,
-        new ::grpc_impl::internal::CallbackBidiHandler< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>(
-          [this] { return this->RegionHeartbeat(); }));
+        new ::grpc_impl::internal::CallbackUnaryHandler< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::schedulerpb::RegionHeartbeatRequest* request,
+                 ::schedulerpb::RegionHeartbeatResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->RegionHeartbeat(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_RegionHeartbeat(
+        ::grpc::experimental::MessageAllocator< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>* allocator) {
+      static_cast<::grpc_impl::internal::CallbackUnaryHandler< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>*>(
+          ::grpc::Service::experimental().GetHandler(9))
+              ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_RegionHeartbeat() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status RegionHeartbeat(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::schedulerpb::RegionHeartbeatResponse, ::schedulerpb::RegionHeartbeatRequest>* /*stream*/)  override {
+    ::grpc::Status RegionHeartbeat(::grpc::ServerContext* /*context*/, const ::schedulerpb::RegionHeartbeatRequest* /*request*/, ::schedulerpb::RegionHeartbeatResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual ::grpc::experimental::ServerBidiReactor< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>* RegionHeartbeat() {
-      return new ::grpc_impl::internal::UnimplementedBidiReactor<
-        ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>;}
+    virtual void RegionHeartbeat(::grpc::ServerContext* /*context*/, const ::schedulerpb::RegionHeartbeatRequest* /*request*/, ::schedulerpb::RegionHeartbeatResponse* /*response*/, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_GetRegion : public BaseClass {
@@ -1892,7 +1901,7 @@ class Scheduler final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status RegionHeartbeat(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::schedulerpb::RegionHeartbeatResponse, ::schedulerpb::RegionHeartbeatRequest>* /*stream*/)  override {
+    ::grpc::Status RegionHeartbeat(::grpc::ServerContext* /*context*/, const ::schedulerpb::RegionHeartbeatRequest* /*request*/, ::schedulerpb::RegionHeartbeatResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -2276,12 +2285,12 @@ class Scheduler final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status RegionHeartbeat(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::schedulerpb::RegionHeartbeatResponse, ::schedulerpb::RegionHeartbeatRequest>* /*stream*/)  override {
+    ::grpc::Status RegionHeartbeat(::grpc::ServerContext* /*context*/, const ::schedulerpb::RegionHeartbeatRequest* /*request*/, ::schedulerpb::RegionHeartbeatResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestRegionHeartbeat(::grpc::ServerContext* context, ::grpc::ServerAsyncReaderWriter< ::grpc::ByteBuffer, ::grpc::ByteBuffer>* stream, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncBidiStreaming(9, context, stream, new_call_cq, notification_cq, tag);
+    void RequestRegionHeartbeat(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(9, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -2733,20 +2742,23 @@ class Scheduler final {
    public:
     ExperimentalWithRawCallbackMethod_RegionHeartbeat() {
       ::grpc::Service::experimental().MarkMethodRawCallback(9,
-        new ::grpc_impl::internal::CallbackBidiHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
-          [this] { return this->RegionHeartbeat(); }));
+        new ::grpc_impl::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->RegionHeartbeat(context, request, response, controller);
+                 }));
     }
     ~ExperimentalWithRawCallbackMethod_RegionHeartbeat() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status RegionHeartbeat(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::schedulerpb::RegionHeartbeatResponse, ::schedulerpb::RegionHeartbeatRequest>* /*stream*/)  override {
+    ::grpc::Status RegionHeartbeat(::grpc::ServerContext* /*context*/, const ::schedulerpb::RegionHeartbeatRequest* /*request*/, ::schedulerpb::RegionHeartbeatResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual ::grpc::experimental::ServerBidiReactor< ::grpc::ByteBuffer, ::grpc::ByteBuffer>* RegionHeartbeat() {
-      return new ::grpc_impl::internal::UnimplementedBidiReactor<
-        ::grpc::ByteBuffer, ::grpc::ByteBuffer>;}
+    virtual void RegionHeartbeat(::grpc::ServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
   class ExperimentalWithRawCallbackMethod_GetRegion : public BaseClass {
@@ -3184,6 +3196,26 @@ class Scheduler final {
     virtual ::grpc::Status StreamedStoreHeartbeat(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::schedulerpb::StoreHeartbeatRequest,::schedulerpb::StoreHeartbeatResponse>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
+  class WithStreamedUnaryMethod_RegionHeartbeat : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_RegionHeartbeat() {
+      ::grpc::Service::MarkMethodStreamed(9,
+        new ::grpc::internal::StreamedUnaryHandler< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>(std::bind(&WithStreamedUnaryMethod_RegionHeartbeat<BaseClass>::StreamedRegionHeartbeat, this, std::placeholders::_1, std::placeholders::_2)));
+    }
+    ~WithStreamedUnaryMethod_RegionHeartbeat() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status RegionHeartbeat(::grpc::ServerContext* /*context*/, const ::schedulerpb::RegionHeartbeatRequest* /*request*/, ::schedulerpb::RegionHeartbeatResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedRegionHeartbeat(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::schedulerpb::RegionHeartbeatRequest,::schedulerpb::RegionHeartbeatResponse>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
   class WithStreamedUnaryMethod_GetRegion : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
@@ -3403,9 +3435,9 @@ class Scheduler final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedGetOperator(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::schedulerpb::GetOperatorRequest,::schedulerpb::GetOperatorResponse>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_GetMembers<WithStreamedUnaryMethod_Bootstrap<WithStreamedUnaryMethod_IsBootstrapped<WithStreamedUnaryMethod_AllocID<WithStreamedUnaryMethod_GetStore<WithStreamedUnaryMethod_PutStore<WithStreamedUnaryMethod_GetAllStores<WithStreamedUnaryMethod_StoreHeartbeat<WithStreamedUnaryMethod_GetRegion<WithStreamedUnaryMethod_GetPrevRegion<WithStreamedUnaryMethod_GetRegionByID<WithStreamedUnaryMethod_ScanRegions<WithStreamedUnaryMethod_AskSplit<WithStreamedUnaryMethod_GetClusterConfig<WithStreamedUnaryMethod_PutClusterConfig<WithStreamedUnaryMethod_ScatterRegion<WithStreamedUnaryMethod_GetGCSafePoint<WithStreamedUnaryMethod_UpdateGCSafePoint<WithStreamedUnaryMethod_GetOperator<Service > > > > > > > > > > > > > > > > > > > StreamedUnaryService;
+  typedef WithStreamedUnaryMethod_GetMembers<WithStreamedUnaryMethod_Bootstrap<WithStreamedUnaryMethod_IsBootstrapped<WithStreamedUnaryMethod_AllocID<WithStreamedUnaryMethod_GetStore<WithStreamedUnaryMethod_PutStore<WithStreamedUnaryMethod_GetAllStores<WithStreamedUnaryMethod_StoreHeartbeat<WithStreamedUnaryMethod_RegionHeartbeat<WithStreamedUnaryMethod_GetRegion<WithStreamedUnaryMethod_GetPrevRegion<WithStreamedUnaryMethod_GetRegionByID<WithStreamedUnaryMethod_ScanRegions<WithStreamedUnaryMethod_AskSplit<WithStreamedUnaryMethod_GetClusterConfig<WithStreamedUnaryMethod_PutClusterConfig<WithStreamedUnaryMethod_ScatterRegion<WithStreamedUnaryMethod_GetGCSafePoint<WithStreamedUnaryMethod_UpdateGCSafePoint<WithStreamedUnaryMethod_GetOperator<Service > > > > > > > > > > > > > > > > > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_GetMembers<WithStreamedUnaryMethod_Bootstrap<WithStreamedUnaryMethod_IsBootstrapped<WithStreamedUnaryMethod_AllocID<WithStreamedUnaryMethod_GetStore<WithStreamedUnaryMethod_PutStore<WithStreamedUnaryMethod_GetAllStores<WithStreamedUnaryMethod_StoreHeartbeat<WithStreamedUnaryMethod_GetRegion<WithStreamedUnaryMethod_GetPrevRegion<WithStreamedUnaryMethod_GetRegionByID<WithStreamedUnaryMethod_ScanRegions<WithStreamedUnaryMethod_AskSplit<WithStreamedUnaryMethod_GetClusterConfig<WithStreamedUnaryMethod_PutClusterConfig<WithStreamedUnaryMethod_ScatterRegion<WithStreamedUnaryMethod_GetGCSafePoint<WithStreamedUnaryMethod_UpdateGCSafePoint<WithStreamedUnaryMethod_GetOperator<Service > > > > > > > > > > > > > > > > > > > StreamedService;
+  typedef WithStreamedUnaryMethod_GetMembers<WithStreamedUnaryMethod_Bootstrap<WithStreamedUnaryMethod_IsBootstrapped<WithStreamedUnaryMethod_AllocID<WithStreamedUnaryMethod_GetStore<WithStreamedUnaryMethod_PutStore<WithStreamedUnaryMethod_GetAllStores<WithStreamedUnaryMethod_StoreHeartbeat<WithStreamedUnaryMethod_RegionHeartbeat<WithStreamedUnaryMethod_GetRegion<WithStreamedUnaryMethod_GetPrevRegion<WithStreamedUnaryMethod_GetRegionByID<WithStreamedUnaryMethod_ScanRegions<WithStreamedUnaryMethod_AskSplit<WithStreamedUnaryMethod_GetClusterConfig<WithStreamedUnaryMethod_PutClusterConfig<WithStreamedUnaryMethod_ScatterRegion<WithStreamedUnaryMethod_GetGCSafePoint<WithStreamedUnaryMethod_UpdateGCSafePoint<WithStreamedUnaryMethod_GetOperator<Service > > > > > > > > > > > > > > > > > > > > StreamedService;
 };
 
 }  // namespace schedulerpb

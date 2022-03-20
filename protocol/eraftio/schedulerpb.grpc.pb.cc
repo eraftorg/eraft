@@ -58,7 +58,7 @@ Scheduler::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
   , rpcmethod_PutStore_(Scheduler_method_names[6], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_GetAllStores_(Scheduler_method_names[7], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_StoreHeartbeat_(Scheduler_method_names[8], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_RegionHeartbeat_(Scheduler_method_names[9], ::grpc::internal::RpcMethod::BIDI_STREAMING, channel)
+  , rpcmethod_RegionHeartbeat_(Scheduler_method_names[9], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_GetRegion_(Scheduler_method_names[10], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_GetPrevRegion_(Scheduler_method_names[11], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_GetRegionByID_(Scheduler_method_names[12], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
@@ -312,20 +312,32 @@ void Scheduler::Stub::experimental_async::StoreHeartbeat(::grpc::ClientContext* 
   return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::schedulerpb::StoreHeartbeatResponse>::Create(channel_.get(), cq, rpcmethod_StoreHeartbeat_, context, request, false);
 }
 
-::grpc::ClientReaderWriter< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>* Scheduler::Stub::RegionHeartbeatRaw(::grpc::ClientContext* context) {
-  return ::grpc_impl::internal::ClientReaderWriterFactory< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>::Create(channel_.get(), rpcmethod_RegionHeartbeat_, context);
+::grpc::Status Scheduler::Stub::RegionHeartbeat(::grpc::ClientContext* context, const ::schedulerpb::RegionHeartbeatRequest& request, ::schedulerpb::RegionHeartbeatResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_RegionHeartbeat_, context, request, response);
 }
 
-void Scheduler::Stub::experimental_async::RegionHeartbeat(::grpc::ClientContext* context, ::grpc::experimental::ClientBidiReactor< ::schedulerpb::RegionHeartbeatRequest,::schedulerpb::RegionHeartbeatResponse>* reactor) {
-  ::grpc_impl::internal::ClientCallbackReaderWriterFactory< ::schedulerpb::RegionHeartbeatRequest,::schedulerpb::RegionHeartbeatResponse>::Create(stub_->channel_.get(), stub_->rpcmethod_RegionHeartbeat_, context, reactor);
+void Scheduler::Stub::experimental_async::RegionHeartbeat(::grpc::ClientContext* context, const ::schedulerpb::RegionHeartbeatRequest* request, ::schedulerpb::RegionHeartbeatResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_RegionHeartbeat_, context, request, response, std::move(f));
 }
 
-::grpc::ClientAsyncReaderWriter< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>* Scheduler::Stub::AsyncRegionHeartbeatRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
-  return ::grpc_impl::internal::ClientAsyncReaderWriterFactory< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>::Create(channel_.get(), cq, rpcmethod_RegionHeartbeat_, context, true, tag);
+void Scheduler::Stub::experimental_async::RegionHeartbeat(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::schedulerpb::RegionHeartbeatResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_RegionHeartbeat_, context, request, response, std::move(f));
 }
 
-::grpc::ClientAsyncReaderWriter< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>* Scheduler::Stub::PrepareAsyncRegionHeartbeatRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
-  return ::grpc_impl::internal::ClientAsyncReaderWriterFactory< ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>::Create(channel_.get(), cq, rpcmethod_RegionHeartbeat_, context, false, nullptr);
+void Scheduler::Stub::experimental_async::RegionHeartbeat(::grpc::ClientContext* context, const ::schedulerpb::RegionHeartbeatRequest* request, ::schedulerpb::RegionHeartbeatResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_RegionHeartbeat_, context, request, response, reactor);
+}
+
+void Scheduler::Stub::experimental_async::RegionHeartbeat(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::schedulerpb::RegionHeartbeatResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_RegionHeartbeat_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::schedulerpb::RegionHeartbeatResponse>* Scheduler::Stub::AsyncRegionHeartbeatRaw(::grpc::ClientContext* context, const ::schedulerpb::RegionHeartbeatRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::schedulerpb::RegionHeartbeatResponse>::Create(channel_.get(), cq, rpcmethod_RegionHeartbeat_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::schedulerpb::RegionHeartbeatResponse>* Scheduler::Stub::PrepareAsyncRegionHeartbeatRaw(::grpc::ClientContext* context, const ::schedulerpb::RegionHeartbeatRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::schedulerpb::RegionHeartbeatResponse>::Create(channel_.get(), cq, rpcmethod_RegionHeartbeat_, context, request, false);
 }
 
 ::grpc::Status Scheduler::Stub::GetRegion(::grpc::ClientContext* context, const ::schedulerpb::GetRegionRequest& request, ::schedulerpb::GetRegionResponse* response) {
@@ -684,8 +696,8 @@ Scheduler::Service::Service() {
           std::mem_fn(&Scheduler::Service::StoreHeartbeat), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       Scheduler_method_names[9],
-      ::grpc::internal::RpcMethod::BIDI_STREAMING,
-      new ::grpc::internal::BidiStreamingHandler< Scheduler::Service, ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>(
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< Scheduler::Service, ::schedulerpb::RegionHeartbeatRequest, ::schedulerpb::RegionHeartbeatResponse>(
           std::mem_fn(&Scheduler::Service::RegionHeartbeat), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       Scheduler_method_names[10],
@@ -809,9 +821,10 @@ Scheduler::Service::~Service() {
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status Scheduler::Service::RegionHeartbeat(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::schedulerpb::RegionHeartbeatResponse, ::schedulerpb::RegionHeartbeatRequest>* stream) {
+::grpc::Status Scheduler::Service::RegionHeartbeat(::grpc::ServerContext* context, const ::schedulerpb::RegionHeartbeatRequest* request, ::schedulerpb::RegionHeartbeatResponse* response) {
   (void) context;
-  (void) stream;
+  (void) request;
+  (void) response;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
