@@ -20,10 +20,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <eraftio/raft_serverpb.pb.h>
 #include <kv/bootstrap.h>
 #include <kv/node.h>
 #include <kv/utils.h>
-#include <eraftio/raft_serverpb.pb.h>
 #include <spdlog/spdlog.h>
 
 namespace kvserver {

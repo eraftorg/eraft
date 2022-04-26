@@ -172,8 +172,8 @@ bool RaftStore::StartWorkers(std::vector<std::shared_ptr<Peer> > peers) {
   auto state = this->state_;
   auto rw = RaftWorker(ctx, router);
   rw.BootThread();
-  auto sw = StoreWorker(ctx, state);
-  sw.BootThread();
+  // auto sw = StoreWorker(ctx, state);
+  // sw.BootThread();
   Msg m(MsgType::MsgTypeStoreStart, ctx->store_.get());
   router->SendStore(m);
   for (uint64_t i = 0; i < peers.size(); i++) {

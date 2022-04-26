@@ -269,7 +269,7 @@ void PeerMsgHandler::HandleRaftReady() {
       // TODO
     }
     // real send raft message to transport (grpc)
-    this->peer_->Send(this->ctx_->trans_, rd.messages);
+    this->peer_->Send(this->ctx_->trans_, rd.messages);  // send to other node
     if (rd.committedEntries.size() > 0) {
       SPDLOG_INFO("rd.committedEntries.size() " +
                   std::to_string(rd.committedEntries.size()));

@@ -20,12 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <eraftio/raft_serverpb.pb.h>
 #include <kv/peer.h>
 #include <kv/peer_storage.h>
 #include <kv/utils.h>
 #include <raftcore/raft.h>
 #include <raftcore/raw_node.h>
-#include <eraftio/raft_serverpb.pb.h>
 #include <rocksdb/write_batch.h>
 #include <spdlog/spdlog.h>
 
