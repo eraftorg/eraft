@@ -38,48 +38,46 @@ RaftNode::RaftNode(std::shared_ptr<RaftStore> system,
 bool RaftNode::Start(std::shared_ptr<DBEngines> engines,
                      std::shared_ptr<TransportInterface> trans) {
   // 1.check store
-  uint64_t storeID;
-  if (!CheckStore(*engines, &storeID)) {
-    SPDLOG_ERROR("store id " + std::to_string(storeID) + " not found");
+  uint64_t *storeID = new uint64_t;
+  if (!CheckStore(*engines, storeID)) {
+    SPDLOG_ERROR("store id " + std::to_string(*storeID) + " not found");
   }
-  if (storeID == RaftEncodeAssistant::GetInstance()->kInvalidID) {
-    BootstrapStore(*engines, &storeID);
+  if (*storeID == RaftEncodeAssistant::GetInstance()->kInvalidID) {
+    BootstrapStore(*engines, storeID);
   }
   // 2.bootstap store
-  store_->set_id(storeID);
+  this->store_->set_id(*storeID);
 
-  auto checkPrepareRes = CheckOrPrepareBoostrapCluster(engines, storeID);
+  auto checkPrepareRes = CheckOrPrepareBoostrapCluster(engines, *storeID);
   if (!checkPrepareRes.second) {
     SPDLOG_ERROR("check or prepare boostrap cluster " +
-                 std::to_string(storeID) + " not found");
+                 std::to_string(*storeID) + " not found");
     return false;
   }
-  // 3.start node, no jump!!  system_->Start(this->store_, this->cfg_, engines,
-  // trans);
-  // bool isNewCluster = (checkPrepareRes.first != nullptr);
-  // if (isNewCluster) {
-  //   if (!BoostrapCluster(engines, checkPrepareRes.first, &isNewCluster)) {
-  //     return false;
-  //   }
-  // }
-  if (StartNode(engines, trans)) {
+  if (!StartNode(engines, trans)) {
+    SPDLOG_INFO("start node failed!");
     return false;
   }
+  SPDLOG_INFO("start node succ");
   return true;
 }
 
-bool RaftNode::CheckStore(DBEngines &engs, uint64_t *storeId) { return true; }
+bool RaftNode::CheckStore(DBEngines &engs, uint64_t *storeId) {
+  *storeId = 0;
+  return true;
+}
 
 bool RaftNode::BootstrapStore(DBEngines &engs, uint64_t *storeId) {
-  auto storeID = raftCfg_->peerAddrMaps_[raftCfg_->storeAddr_];
-  SPDLOG_INFO("boostrap store with storeID: " + std::to_string(*storeId));
+  int findStoreId = raftCfg_->peerAddrMaps_[raftCfg_->storeAddr_];
+  SPDLOG_INFO("boostrap store with storeID: " + std::to_string(findStoreId) +
+              " addr: " + this->store_->address());
   if (!BootHelper::GetInstance()->DoBootstrapStore(
-          std::make_shared<DBEngines>(engs), this->clusterID_, storeID,
+          std::make_shared<DBEngines>(engs), this->clusterID_, findStoreId,
           this->store_->address())) {
     SPDLOG_ERROR("do bootstrap store error!");
     return false;
   }
-  *storeId = storeID;
+  *storeId = findStoreId;
   return true;
 }
 
@@ -88,7 +86,7 @@ uint64_t RaftNode::AllocID() { return BootHelper::GetInstance()->AllocID(); }
 std::pair<std::shared_ptr<metapb::Region>, bool>
 RaftNode::CheckOrPrepareBoostrapCluster(std::shared_ptr<DBEngines> engines,
                                         uint64_t storeId) {
-  PrepareBootstrapCluster(engines, storeId);
+  return this->PrepareBootstrapCluster(engines, storeId);
 }
 
 bool RaftNode::CheckClusterBoostrapped() { return true; }

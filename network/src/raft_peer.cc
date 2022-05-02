@@ -50,9 +50,14 @@ RaftPeer::RaftPeer(uint64_t storeId, std::shared_ptr<RaftConfig> cfg,
   std::shared_ptr<RaftPeerStorage> ps =
       std::make_shared<RaftPeerStorage>(dbEngines, region, tag);
   uint64_t appliedIndex = ps->AppliedIndex();
+  SPDLOG_INFO("appliedIndex" + std::to_string(appliedIndex));
+
+  SPDLOG_INFO("make config");
 
   eraft::Config nodeConf(meta->id(), cfg->raftElectionTimeoutTicks_,
                          cfg->raftHeartbeatTicks_, appliedIndex, ps);
+  SPDLOG_INFO("make RawNode");
+
   std::shared_ptr<eraft::RawNode> raftGroup =
       std::make_shared<eraft::RawNode>(nodeConf);
 

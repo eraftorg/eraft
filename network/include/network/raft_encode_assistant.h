@@ -26,6 +26,7 @@
 #include <eraftio/raft_messagepb.pb.h>
 #include <google/protobuf/message.h>
 #include <google/protobuf/text_format.h>
+#include <spdlog/spdlog.h>
 #include <storage/engine_interface.h>
 
 #include <cstdint>
@@ -331,7 +332,10 @@ class RaftEncodeAssistant {
   static storage::EngOpStatus PutMessageToEngine(
       std::shared_ptr<storage::StorageEngineInterface> db, std::string key,
       google::protobuf::Message &msg) {
+    std::string debugVal;
+    google::protobuf::TextFormat::PrintToString(msg, &debugVal);
     std::string val = msg.SerializeAsString();
+    SPDLOG_INFO("put k -> " + key + " value" + debugVal + " to DB");
     return db->PutK(key, val);
   }
 

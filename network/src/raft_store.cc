@@ -37,15 +37,14 @@ RaftStore::~RaftStore() {}
 std::shared_ptr<GlobalContext> RaftStore::GetContext() { return ctx_; }
 
 std::vector<std::shared_ptr<RaftPeer> > RaftStore::LoadPeers() {
-  auto ctx = this->ctx_;
-  auto storeID = ctx->store_->id();
-  SPDLOG_INFO("raft store store id: " + std::to_string(storeID) +
-              " load peers");
+  auto storeID = this->ctx_->store_->id();
+  SPDLOG_INFO("RaftStore::LoadPeers -> raft store store id: " +
+              std::to_string(storeID) + " load peers");
   std::vector<std::shared_ptr<RaftPeer> > regionPeers;
 
   std::vector<std::string> keys;
   std::vector<std::string> values;
-  ctx->engine_->kvDB_->RangeQuery(
+  this->ctx_->engine_->kvDB_->RangeQuery(
       RaftEncodeAssistant::GetInstance()->RegionMetaMinKeyStr(),
       RaftEncodeAssistant::GetInstance()->RegionMetaMaxKeyStr(), keys, values);
   for (int i = 0; i < keys.size(); i++) {
@@ -55,23 +54,27 @@ std::vector<std::shared_ptr<RaftPeer> > RaftStore::LoadPeers() {
     RaftEncodeAssistant::GetInstance()->DecodeRegionMetaKey(
         RaftEncodeAssistant::GetInstance()->StringToVec(keys[i]), &regionID,
         &suffix);
+    SPDLOG_INFO("find region -> " + std::to_string(regionID));
 
-    if (suffix != RaftEncodeAssistant::GetInstance()->kRegionStateSuffix[0]) {
-      continue;
-    }
+    // if (suffix != RaftEncodeAssistant::GetInstance()->kRegionStateSuffix[0])
+    // {
+    //   continue;
+    // }
 
     raft_messagepb::RegionLocalState *localState =
         new raft_messagepb::RegionLocalState();
     localState->ParseFromString(values[i]);
+    std::string debugVal;
+    google::protobuf::TextFormat::PrintToString(*localState, &debugVal);
+    SPDLOG_INFO("local state: " + debugVal);
 
     auto region = localState->region();
     metapb::Region *region1 = new metapb::Region(region);
 
-    std::shared_ptr<RaftPeer> peer =
-        std::make_shared<RaftPeer>(storeID, ctx->cfg_, ctx->engine_,
-                                   std::make_shared<metapb::Region>(region));
-    // ctx->storeMeta_->regions_[regionID] = &region;
-    ctx->storeMeta_->regions_.insert(
+    std::shared_ptr<RaftPeer> peer = std::make_shared<RaftPeer>(
+        storeID, this->ctx_->cfg_, this->ctx_->engine_,
+        std::make_shared<metapb::Region>(region));
+    this->ctx_->storeMeta_->regions_.insert(
         std::pair<int, metapb::Region *>(regionID, region1));
     regionPeers.push_back(peer);
   }
@@ -106,30 +109,34 @@ bool RaftStore::Start(std::shared_ptr<metapb::Store> meta,
   // register peer
   auto regionPeers = this->LoadPeers();
 
+  SPDLOG_INFO("peer size: " + std::to_string(regionPeers.size()));
   for (auto peer : regionPeers) {
     this->router_->Register(peer);
   }
+  SPDLOG_INFO("Register succ");
 
-  this->StartWorkers(regionPeers);
+  // StartWorkers(regionPeers);
+
+  return true;
 }
 
 bool RaftStore::StartWorkers(std::vector<std::shared_ptr<RaftPeer> > peers) {
   auto ctx = this->ctx_;
   auto router = this->router_;
   auto state = this->state_;
-  auto rw = RaftWorker(ctx, router);
-  rw.BootThread();
-  Msg m(MsgType::MsgTypeStoreStart, ctx->store_.get());
-  router->SendStore(m);
-  for (uint64_t i = 0; i < peers.size(); i++) {
-    auto regionID = peers[i]->regionId_;
-    Msg m(MsgType::MsgTypeStart, ctx->store_.get());
-    router->Send(regionID, m);
-  }
-  // ticker start
-  std::chrono::duration<int, std::milli> timer_tick(50);
-  Ticker::GetInstance(std::function<void()>(Ticker::Run), router, timer_tick)
-      ->Start();
+  // auto rw = RaftWorker(ctx, router);
+  // rw.BootThread();
+  // Msg m(MsgType::MsgTypeStoreStart, ctx->store_.get());
+  // router->SendStore(m);
+  // for (uint64_t i = 0; i < peers.size(); i++) {
+  //   auto regionID = peers[i]->regionId_;
+  //   Msg m(MsgType::MsgTypeStart, ctx->store_.get());
+  //   router->Send(regionID, m);
+  // }
+  // // ticker start
+  // std::chrono::duration<int, std::milli> timer_tick(50);
+  // Ticker::GetInstance(std::function<void()>(Ticker::Run), router, timer_tick)
+  //     ->Start();
 
   return true;
 }

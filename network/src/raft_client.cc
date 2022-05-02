@@ -65,7 +65,9 @@ std::shared_ptr<RaftConn> RaftClient::GetConn(std::string addr,
 
 redisContext *RaftConn::GetConnContext() { return redisConnContext_; }
 
-RaftClient::RaftClient(std::shared_ptr<RaftConfig> conf) : conf_(conf) {}
+RaftClient::RaftClient(std::shared_ptr<RaftConfig> conf) : conf_(conf) {
+  SPDLOG_DEBUG("init raft client.");
+}
 
 RaftClient::~RaftClient() {}
 

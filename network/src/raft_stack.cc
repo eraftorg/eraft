@@ -46,17 +46,18 @@ std::string RaftStack::Read() {}
 
 bool RaftStack::Start() {
   // raft system init
-  raftSystem_ = std::make_shared<RaftStore>();
+  this->raftSystem_ = std::make_shared<RaftStore>();
 
   // router init
-  raftRouter_ = this->raftSystem_->raftRouter_;
+  this->raftRouter_ = this->raftSystem_->raftRouter_;
 
   // raft client init
   std::shared_ptr<RaftClient> raftClient =
       std::make_shared<RaftClient>(this->raftConf_);
 
   // raft node init
-  raftNode_ = std::make_shared<RaftNode>(this->raftSystem_, this->raftConf_);
+  this->raftNode_ =
+      std::make_shared<RaftNode>(this->raftSystem_, this->raftConf_);
 
   // init server transport
   std::shared_ptr<RaftServerTransport> trans =
@@ -66,5 +67,6 @@ bool RaftStack::Start() {
   } else {
     SPDLOG_ERROR("raftstack start failed!");
   }
+  return true;
 }
 }  // namespace network

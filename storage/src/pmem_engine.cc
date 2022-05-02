@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <spdlog/spdlog.h>
 #include <storage/pmem_engine.h>
 
 #include <iostream>
@@ -97,18 +98,25 @@ EngOpStatus PMemEngine::PutWriteBatch(WriteBatch& batch) {
 EngOpStatus PMemEngine::RangeQuery(std::string startK, std::string endK,
                                    std::vector<std::string>& matchKeys,
                                    std::vector<std::string>& matchValues) {
+  SPDLOG_INFO("start range query start: " + startK + " end: " + endK);
+
   auto rangeIter = engine_->new_read_iterator();
   auto& sIt = rangeIter.get_value();
   auto seekStatus = sIt.seek_higher_eq(startK);
+  SPDLOG_INFO("start range query -> " + startK);
   do {
-    pmem::kv::result<pmem::kv::string_view> keyRes = sIt.key();
-    std::string currentKey = keyRes.get_value().data();
-    matchKeys.push_back(currentKey);
-    if (currentKey.compare(endK) <= 0) {
-      std::string currentValue = sIt.read_range().get_value().data();
-      matchValues.push_back(currentValue);
-    } else {
-      return EngOpStatus::OK;
+    if (seekStatus == pmem::kv::status::OK) {
+      pmem::kv::result<pmem::kv::string_view> keyRes = sIt.key();
+      std::string currentKey = keyRes.get_value().data();
+      if (currentKey.compare(endK) <= 0) {
+        SPDLOG_INFO("read cur key -> " + currentKey);
+        matchKeys.push_back(currentKey);
+        std::string currentValue = sIt.read_range().get_value().data();
+        matchValues.push_back(currentValue);
+        SPDLOG_INFO("read cur value -> " + currentValue);
+      } else {
+        return EngOpStatus::OK;
+      }
     }
   } while (sIt.next() == pmem::kv::status::OK);
   return EngOpStatus::OK;

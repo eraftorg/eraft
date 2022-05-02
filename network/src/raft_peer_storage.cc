@@ -68,6 +68,7 @@ RaftPeerStorage::InitialState() {
 // Entries returns at least one entry if any.
 std::vector<eraftpb::Entry> RaftPeerStorage::Entries(uint64_t lo, uint64_t hi) {
   // pmem range query
+  return std::vector<eraftpb::Entry>{};
 }
 
 // Term returns the term of entry i, which must be in the range
@@ -108,7 +109,13 @@ uint64_t RaftPeerStorage::FirstIndex() { return this->TruncatedIndex() + 1; }
 // If snapshot is temporarily unavailable, it should return
 // ErrSnapshotTemporarilyUnavailable, so raft state machine could know that
 // Storage needs some time to prepare snapshot and call Snapshot later.
-eraftpb::Snapshot RaftPeerStorage::Snapshot() {}
+eraftpb::Snapshot RaftPeerStorage::Snapshot() {
+  std::shared_ptr<eraftpb::Snapshot> snap =
+      std::make_shared<eraftpb::Snapshot>();
+  snap->mutable_metadata()->set_index(this->applyState_->index());
+  snap->mutable_metadata()->set_term(this->applyState_->term());
+  return *snap;
+}
 
 bool RaftPeerStorage::IsInitialized() {
   return (this->region_->peers().size() > 0);
@@ -134,7 +141,7 @@ uint64_t RaftPeerStorage::TruncatedIndex() {
 
 uint64_t RaftPeerStorage::TruncatedTerm() { return this->applyState_->term(); }
 
-bool RaftPeerStorage::ClearMeta() {}
+bool RaftPeerStorage::ClearMeta() { return true; }
 
 std::shared_ptr<ApplySnapResult> RaftPeerStorage::SaveReadyState(
     std::shared_ptr<eraft::DReady> ready) {

@@ -36,13 +36,14 @@ std::shared_ptr<RaftPeerState> Router::Get(uint64_t regionId) {
 }
 
 void Router::Register(std::shared_ptr<RaftPeer> peer) {
-  SPDLOG_DEBUG("register peer regionId -> " + std::to_string(peer->regionId_) +
-               " peer id -> " + std::to_string(peer->PeerId()) +
-               " peer addr -> " + peer->meta_->addr() + " to router");
+  SPDLOG_INFO("register peer regionId -> " + std::to_string(peer->regionId_) +
+              " peer id -> " + std::to_string(peer->PeerId()) +
+              " peer addr -> " + peer->meta_->addr() + " to router");
 
   std::shared_ptr<RaftPeerState> peerState =
       std::make_shared<RaftPeerState>(peer);
-  peers_.insert(std::pair<uint64_t, std::shared_ptr<RaftPeerState> >(
+  SPDLOG_INFO("make RaftPeerState succ");
+  this->peers_.insert(std::pair<uint64_t, std::shared_ptr<RaftPeerState> >(
       peer->regionId_, peerState));
 }
 
