@@ -40,6 +40,15 @@ RaftPeerStorage::RaftPeerStorage(std::shared_ptr<DBEngines> engs,
   auto applyStatePair =
       RaftEncodeAssistant::GetInstance()->InitApplyState(engs->kvDB_, region);
 
+  if (raftStatePair.first->last_index() <
+      applyStatePair.first->applied_index()) {
+    SPDLOG_ERROR("raft log last index less than applied index! " +
+                 std::to_string(raftStatePair.first->last_index()) + " < " +
+                 std::to_string(applyStatePair.first->applied_index()) + " , " +
+                 std::to_string(region->id()));
+    exit(-1);
+  }
+
   // checkout last index < applied_index
   this->raftState_ = raftStatePair.first;
   this->applyState_ = applyStatePair.first;
@@ -68,7 +77,30 @@ RaftPeerStorage::InitialState() {
 // Entries returns at least one entry if any.
 std::vector<eraftpb::Entry> RaftPeerStorage::Entries(uint64_t lo, uint64_t hi) {
   // pmem range query
-  return std::vector<eraftpb::Entry>{};
+  std::vector<eraftpb::Entry> ents;
+
+  std::string startKey =
+      RaftEncodeAssistant::GetInstance()->RaftLogKey(this->region_->id(), lo);
+  std::string endKey =
+      RaftEncodeAssistant::GetInstance()->RaftLogKey(this->region_->id(), hi);
+
+  std::vector<std::string> keys, values;
+  this->engines_->raftDB_->RangeQuery(startKey, endKey, keys, values);
+
+  uint64_t nextIndex = lo;
+  for (int i = 0; i < keys.size(); i++) {
+    eraftpb::Entry ent;
+    ent.ParseFromString(values[i]);
+
+    if (ent.index() != nextIndex) {
+      break;
+    }
+
+    nextIndex++;
+    ents.push_back(ent);
+  }
+
+  return ents;
 }
 
 // Term returns the term of entry i, which must be in the range
@@ -117,63 +149,6 @@ eraftpb::Snapshot RaftPeerStorage::Snapshot() {
   return *snap;
 }
 
-bool RaftPeerStorage::IsInitialized() {
-  return (this->region_->peers().size() > 0);
-}
-
-std::shared_ptr<metapb::Region> RaftPeerStorage::Region() {
-  return this->region_;
-}
-
-void RaftPeerStorage::SetRegion(std::shared_ptr<metapb::Region> region) {
-  this->region_ = region;
-}
-
-bool RaftPeerStorage::CheckRange(uint64_t low, uint64_t high) {}
-
-uint64_t RaftPeerStorage::AppliedIndex() {
-  return this->applyState_->applied_index();
-}
-
-uint64_t RaftPeerStorage::TruncatedIndex() {
-  return this->applyState_->index();
-}
-
-uint64_t RaftPeerStorage::TruncatedTerm() { return this->applyState_->term(); }
-
-bool RaftPeerStorage::ClearMeta() { return true; }
-
-std::shared_ptr<ApplySnapResult> RaftPeerStorage::SaveReadyState(
-    std::shared_ptr<eraft::DReady> ready) {
-  std::shared_ptr<storage::WriteBatch> raftWB =
-      std::make_shared<storage::WriteBatch>();
-
-  ApplySnapResult result;
-  if (!eraft::IsEmptySnap(ready->snapshot)) {
-    this->raftState_->set_last_index(ready->snapshot.metadata().index());
-    this->raftState_->set_last_term(ready->snapshot.metadata().term());
-    this->applyState_->set_applied_index(ready->snapshot.metadata().index());
-    this->applyState_->set_index(ready->snapshot.metadata().index());
-    this->applyState_->set_term(ready->snapshot.metadata().term());
-  }
-
-  this->Append(ready->entries, this->engines_->raftDB_);
-
-  this->raftState_->mutable_hard_state()->set_commit(ready->hardSt.commit());
-  this->raftState_->mutable_hard_state()->set_term(ready->hardSt.term());
-  this->raftState_->mutable_hard_state()->set_vote(ready->hardSt.vote());
-
-  RaftEncodeAssistant::GetInstance()->PutMessageToEngine(
-      this->engines_->raftDB_,
-      RaftEncodeAssistant::GetInstance()->RaftStateKey(this->region_->id()),
-      *this->raftState_);
-
-  return std::make_shared<ApplySnapResult>(result);
-}
-
-void RaftPeerStorage::ClearRange(uint64_t regionID, std::string start,
-                                 std::string end) {}
-
 bool RaftPeerStorage::Append(
     std::vector<eraftpb::Entry> entries,
     std::shared_ptr<storage::StorageEngineInterface> raftEng) {
@@ -215,6 +190,72 @@ bool RaftPeerStorage::Append(
 
   return true;
 }
+
+uint64_t RaftPeerStorage::AppliedIndex() {
+  return this->applyState_->applied_index();
+}
+
+bool RaftPeerStorage::IsInitialized() {
+  return (this->region_->peers().size() > 0);
+}
+
+std::shared_ptr<metapb::Region> RaftPeerStorage::Region() {
+  return this->region_;
+}
+
+uint64_t RaftPeerStorage::TruncatedIndex() {
+  return this->applyState_->index();
+}
+
+void RaftPeerStorage::SetRegion(std::shared_ptr<metapb::Region> region) {
+  this->region_ = region;
+}
+
+bool RaftPeerStorage::CheckRange(uint64_t low, uint64_t high) {
+  if (low > high) {
+    return false;
+  } else if (low <= this->TruncatedIndex()) {
+    return false;
+  } else if (high > this->raftState_->last_index() + 1) {
+    return false;
+  }
+  return true;
+}
+
+uint64_t RaftPeerStorage::TruncatedTerm() { return this->applyState_->term(); }
+
+bool RaftPeerStorage::ClearMeta() { return true; }
+
+std::shared_ptr<ApplySnapResult> RaftPeerStorage::SaveReadyState(
+    std::shared_ptr<eraft::DReady> ready) {
+  std::shared_ptr<storage::WriteBatch> raftWB =
+      std::make_shared<storage::WriteBatch>();
+
+  ApplySnapResult result;
+  if (!eraft::IsEmptySnap(ready->snapshot)) {
+    this->raftState_->set_last_index(ready->snapshot.metadata().index());
+    this->raftState_->set_last_term(ready->snapshot.metadata().term());
+    this->applyState_->set_applied_index(ready->snapshot.metadata().index());
+    this->applyState_->set_index(ready->snapshot.metadata().index());
+    this->applyState_->set_term(ready->snapshot.metadata().term());
+  }
+
+  this->Append(ready->entries, this->engines_->raftDB_);
+
+  this->raftState_->mutable_hard_state()->set_commit(ready->hardSt.commit());
+  this->raftState_->mutable_hard_state()->set_term(ready->hardSt.term());
+  this->raftState_->mutable_hard_state()->set_vote(ready->hardSt.vote());
+
+  RaftEncodeAssistant::GetInstance()->PutMessageToEngine(
+      this->engines_->raftDB_,
+      RaftEncodeAssistant::GetInstance()->RaftStateKey(this->region_->id()),
+      *this->raftState_);
+
+  return std::make_shared<ApplySnapResult>(result);
+}
+
+void RaftPeerStorage::ClearRange(uint64_t regionID, std::string start,
+                                 std::string end) {}
 
 std::shared_ptr<metapb::Region> RaftPeerStorage::GetRegion() {
   return this->region_;

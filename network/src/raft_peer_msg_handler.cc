@@ -237,6 +237,7 @@ void RaftPeerMsgHandler::HandleRaftReady() {
     eraft::DReady rd = this->peer_->raftGroup_->EReady();
     auto result = this->peer_->peerStorage_->SaveReadyState(
         std::make_shared<eraft::DReady>(rd));
+    // !!! real send raft message from transport to peer node server
     peer_->Send(ctx_->trans_, rd.messages);
     if (rd.committedEntries.size() > 0) {
       SPDLOG_INFO("rd.committedEntries.size() " +
@@ -255,7 +256,10 @@ void RaftPeerMsgHandler::HandleRaftReady() {
           lastEnt.index());
       this->peer_->peerStorage_->applyState_->set_index(lastEnt.index());
       this->peer_->peerStorage_->applyState_->set_term(lastEnt.term());
-
+      SPDLOG_INFO(
+          "write to db applied index: " + std::to_string(lastEnt.index()) +
+          " truncated state index: " + std::to_string(lastEnt.index()) +
+          " truncated state term " + std::to_string(lastEnt.term()));
       RaftEncodeAssistant::GetInstance()->PutMessageToEngine(
           this->peer_->peerStorage_->engines_->kvDB_,
           RaftEncodeAssistant::GetInstance()->ApplyStateKey(

@@ -115,7 +115,7 @@ bool RaftStore::Start(std::shared_ptr<metapb::Store> meta,
   }
   SPDLOG_INFO("Register succ");
 
-  // StartWorkers(regionPeers);
+  StartWorkers(regionPeers);
 
   return true;
 }
@@ -124,19 +124,25 @@ bool RaftStore::StartWorkers(std::vector<std::shared_ptr<RaftPeer> > peers) {
   auto ctx = this->ctx_;
   auto router = this->router_;
   auto state = this->state_;
-  // auto rw = RaftWorker(ctx, router);
-  // rw.BootThread();
-  // Msg m(MsgType::MsgTypeStoreStart, ctx->store_.get());
-  // router->SendStore(m);
-  // for (uint64_t i = 0; i < peers.size(); i++) {
-  //   auto regionID = peers[i]->regionId_;
-  //   Msg m(MsgType::MsgTypeStart, ctx->store_.get());
-  //   router->Send(regionID, m);
-  // }
-  // // ticker start
-  // std::chrono::duration<int, std::milli> timer_tick(50);
-  // Ticker::GetInstance(std::function<void()>(Ticker::Run), router, timer_tick)
-  //     ->Start();
+  auto rw = RaftWorker(ctx, router);
+  rw.BootThread();
+  Msg m(MsgType::MsgTypeStoreStart, ctx->store_.get());
+  SPDLOG_INFO("start raftworker succ");
+
+  router->SendStore(m);
+  for (uint64_t i = 0; i < peers.size(); i++) {
+    auto regionID = peers[i]->regionId_;
+    Msg m(MsgType::MsgTypeStart, ctx->store_.get());
+    router->Send(regionID, m);
+  }
+  SPDLOG_INFO("send start msg succ");
+
+  // ticker start
+  std::chrono::duration<int, std::milli> timer_tick(2000);
+  Ticker::GetInstance(std::function<void()>(Ticker::Run), router, timer_tick)
+      ->Start();
+
+  SPDLOG_INFO("start ticker succ");
 
   return true;
 }

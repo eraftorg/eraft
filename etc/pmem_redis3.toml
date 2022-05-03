@@ -1,0 +1,13 @@
+[server]
+
+addr = "172.19.0.13:20162"
+
+logdir = "logs/tiredis.log"
+
+[db]
+
+path = "/tmp/pmem3_radix"
+
+[raft]
+
+node_id = 3

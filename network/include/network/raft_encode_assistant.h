@@ -335,7 +335,7 @@ class RaftEncodeAssistant {
     std::string debugVal;
     google::protobuf::TextFormat::PrintToString(msg, &debugVal);
     std::string val = msg.SerializeAsString();
-    SPDLOG_INFO("put k -> " + key + " value" + debugVal + " to DB");
+    SPDLOG_INFO("put value -> " + debugVal + " to DB");
     return db->PutK(key, val);
   }
 

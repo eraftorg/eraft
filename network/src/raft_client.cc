@@ -38,14 +38,19 @@ RaftConn::RaftConn(std::string targetAddr_) {
 RaftConn::~RaftConn() { redisFree(redisConnContext_); }
 
 bool RaftConn::Send(raft_messagepb::RaftMessage &msg, std::string cmd) {
-  std::string sendMsg = msg.SerializeAsString();
-  redisReply *reply = static_cast<redisReply *>(
-      redisCommand(redisConnContext_, "%s %s", cmd.c_str(), sendMsg.c_str()));
-  if (std::string(reply->str) != "OK") {
-    SPDLOG_ERROR("send raftmessage error: " + std::string(reply->str));
-    return false;
+  if (redisConnContext_ != nullptr) {
+    std::string sendMsg = msg.SerializeAsString();
+
+    redisReply *reply = static_cast<redisReply *>(
+        redisCommand(redisConnContext_, "%s %s", cmd.c_str(), sendMsg.c_str()));
+    if (std::string(reply->str) != "OK") {
+      SPDLOG_ERROR("send raftmessage error: " + std::string(reply->str));
+      return false;
+    }
+    freeReplyObject(reply);
+  } else {
+    SPDLOG_ERROR("connect to peer error!");
   }
-  freeReplyObject(reply);
   return true;
 }
 
@@ -74,6 +79,7 @@ RaftClient::~RaftClient() {}
 bool RaftClient::Send(uint64_t storeId, std::string addr,
                       raft_messagepb::RaftMessage &msg) {
   std::shared_ptr<RaftConn> conn = this->GetConn(addr, msg.region_id());
+  SPDLOG_INFO("pushraftmsg to " + addr + " succ ");
   return conn->Send(msg, "pushraftmsg");
 }
 

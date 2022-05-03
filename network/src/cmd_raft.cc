@@ -25,6 +25,7 @@
 #include <network/command.h>
 #include <network/common.h>
 #include <network/unbounded_buffer.h>
+#include <spdlog/spdlog.h>
 
 #include <string>
 
@@ -33,6 +34,7 @@ Error pushraftmsg(const std::vector<std::string> &params,
   std::shared_ptr<raft_messagepb::RaftMessage> raftMessage =
       std::make_shared<raft_messagepb::RaftMessage>();
   raftMessage->ParseFromString(params[1]);
+  SPDLOG_INFO("on pushraftmsg deal -> " + raftMessage->DebugString());
   PMemRedis::GetInstance()->GetRaftStack()->Raft(raftMessage.get());
   return Error_ok;
 }
