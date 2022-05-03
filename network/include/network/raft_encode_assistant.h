@@ -353,10 +353,13 @@ class RaftEncodeAssistant {
   static std::pair<raft_messagepb::RaftLocalState *, storage::EngOpStatus>
   GetRaftLocalState(std::shared_ptr<storage::StorageEngineInterface> raftEngine,
                     uint64_t regionId) {
+    SPDLOG_INFO("GetRaftLocalState from db");
     raft_messagepb::RaftLocalState *raftLocalState =
         new raft_messagepb::RaftLocalState();
     auto status = GetMessageFromEngine(raftEngine, RaftStateKey(regionId),
                                        *raftLocalState);
+    SPDLOG_INFO("GetRaftLocalState " + raftLocalState->DebugString() +
+                "from db");
     return std::pair<raft_messagepb::RaftLocalState *, storage::EngOpStatus>(
         raftLocalState, status);
   }
@@ -381,8 +384,8 @@ class RaftEncodeAssistant {
           new raft_messagepb::RaftApplyState();
       if (region->peers().size() > 0) {
         applyState->set_applied_index(kRaftInitLogIndex);
-        applyState->set_index(kRaftInitLogIndex);
-        applyState->set_term(kRaftInitLogTerm);
+        applyState->mutable_truncated_state()->set_index(kRaftInitLogIndex);
+        applyState->mutable_truncated_state()->set_term(kRaftInitLogTerm);
       }
       auto status = PutMessageToEngine(kvEngine, ApplyStateKey(region->id()),
                                        *applyState);
@@ -392,7 +395,7 @@ class RaftEncodeAssistant {
       }
     }
     return std::pair<raft_messagepb::RaftApplyState *, bool>(
-        applyStatePair.first, true);
+        applyStatePair.first, false);
   }
 
   static std::pair<raft_messagepb::RaftLocalState *, bool> InitRaftLocalState(

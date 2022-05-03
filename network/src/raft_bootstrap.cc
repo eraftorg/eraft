@@ -156,10 +156,15 @@ void BootHelper::WriteInitialApplyState(storage::WriteBatch &kvWB,
                                         uint64_t regionId) {
   std::shared_ptr<raft_messagepb::RaftApplyState> applyState =
       std::make_shared<raft_messagepb::RaftApplyState>();
-  applyState->set_index(RaftEncodeAssistant::GetInstance()->kRaftInitLogIndex);
+  raft_messagepb::RaftTruncatedState *truncatedState =
+      new raft_messagepb::RaftTruncatedState();
   applyState->set_applied_index(
       RaftEncodeAssistant::GetInstance()->kRaftInitLogIndex);
-  applyState->set_term(RaftEncodeAssistant::GetInstance()->kRaftInitLogTerm);
+  truncatedState->set_index(
+      RaftEncodeAssistant::GetInstance()->kRaftInitLogIndex);
+  truncatedState->set_term(
+      RaftEncodeAssistant::GetInstance()->kRaftInitLogTerm);
+  applyState->set_allocated_truncated_state(truncatedState);
   std::string val = applyState->SerializeAsString();
   kvWB.Put(RaftEncodeAssistant::GetInstance()->ApplyStateKey(regionId), val);
 }

@@ -627,17 +627,14 @@ class RaftApplyState : public ::google::protobuf::Message /* @@protoc_insertion_
   ::google::protobuf::uint64 applied_index() const;
   void set_applied_index(::google::protobuf::uint64 value);
 
-  // optional uint64 index = 2;
-  void clear_index();
-  static const int kIndexFieldNumber = 2;
-  ::google::protobuf::uint64 index() const;
-  void set_index(::google::protobuf::uint64 value);
-
-  // optional uint64 term = 3;
-  void clear_term();
-  static const int kTermFieldNumber = 3;
-  ::google::protobuf::uint64 term() const;
-  void set_term(::google::protobuf::uint64 value);
+  // optional .raft_messagepb.RaftTruncatedState truncated_state = 2;
+  bool has_truncated_state() const;
+  void clear_truncated_state();
+  static const int kTruncatedStateFieldNumber = 2;
+  const ::raft_messagepb::RaftTruncatedState& truncated_state() const;
+  ::raft_messagepb::RaftTruncatedState* mutable_truncated_state();
+  ::raft_messagepb::RaftTruncatedState* release_truncated_state();
+  void set_allocated_truncated_state(::raft_messagepb::RaftTruncatedState* truncated_state);
 
   // @@protoc_insertion_point(class_scope:raft_messagepb.RaftApplyState)
  private:
@@ -645,8 +642,7 @@ class RaftApplyState : public ::google::protobuf::Message /* @@protoc_insertion_
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   bool _is_default_instance_;
   ::google::protobuf::uint64 applied_index_;
-  ::google::protobuf::uint64 index_;
-  ::google::protobuf::uint64 term_;
+  ::raft_messagepb::RaftTruncatedState* truncated_state_;
   mutable int _cached_size_;
   friend void  protobuf_AddDesc_raft_5fmessagepb_2eproto();
   friend void protobuf_AssignDesc_raft_5fmessagepb_2eproto();
@@ -3732,32 +3728,42 @@ inline void RaftApplyState::set_applied_index(::google::protobuf::uint64 value) 
   // @@protoc_insertion_point(field_set:raft_messagepb.RaftApplyState.applied_index)
 }
 
-// optional uint64 index = 2;
-inline void RaftApplyState::clear_index() {
-  index_ = GOOGLE_ULONGLONG(0);
+// optional .raft_messagepb.RaftTruncatedState truncated_state = 2;
+inline bool RaftApplyState::has_truncated_state() const {
+  return !_is_default_instance_ && truncated_state_ != NULL;
 }
-inline ::google::protobuf::uint64 RaftApplyState::index() const {
-  // @@protoc_insertion_point(field_get:raft_messagepb.RaftApplyState.index)
-  return index_;
+inline void RaftApplyState::clear_truncated_state() {
+  if (GetArenaNoVirtual() == NULL && truncated_state_ != NULL) delete truncated_state_;
+  truncated_state_ = NULL;
 }
-inline void RaftApplyState::set_index(::google::protobuf::uint64 value) {
+inline const ::raft_messagepb::RaftTruncatedState& RaftApplyState::truncated_state() const {
+  // @@protoc_insertion_point(field_get:raft_messagepb.RaftApplyState.truncated_state)
+  return truncated_state_ != NULL ? *truncated_state_ : *default_instance_->truncated_state_;
+}
+inline ::raft_messagepb::RaftTruncatedState* RaftApplyState::mutable_truncated_state() {
   
-  index_ = value;
-  // @@protoc_insertion_point(field_set:raft_messagepb.RaftApplyState.index)
+  if (truncated_state_ == NULL) {
+    truncated_state_ = new ::raft_messagepb::RaftTruncatedState;
+  }
+  // @@protoc_insertion_point(field_mutable:raft_messagepb.RaftApplyState.truncated_state)
+  return truncated_state_;
 }
-
-// optional uint64 term = 3;
-inline void RaftApplyState::clear_term() {
-  term_ = GOOGLE_ULONGLONG(0);
-}
-inline ::google::protobuf::uint64 RaftApplyState::term() const {
-  // @@protoc_insertion_point(field_get:raft_messagepb.RaftApplyState.term)
-  return term_;
-}
-inline void RaftApplyState::set_term(::google::protobuf::uint64 value) {
+inline ::raft_messagepb::RaftTruncatedState* RaftApplyState::release_truncated_state() {
+  // @@protoc_insertion_point(field_release:raft_messagepb.RaftApplyState.truncated_state)
   
-  term_ = value;
-  // @@protoc_insertion_point(field_set:raft_messagepb.RaftApplyState.term)
+  ::raft_messagepb::RaftTruncatedState* temp = truncated_state_;
+  truncated_state_ = NULL;
+  return temp;
+}
+inline void RaftApplyState::set_allocated_truncated_state(::raft_messagepb::RaftTruncatedState* truncated_state) {
+  delete truncated_state_;
+  truncated_state_ = truncated_state;
+  if (truncated_state) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_set_allocated:raft_messagepb.RaftApplyState.truncated_state)
 }
 
 // -------------------------------------------------------------------

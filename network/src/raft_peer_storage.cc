@@ -144,8 +144,10 @@ uint64_t RaftPeerStorage::FirstIndex() { return this->TruncatedIndex() + 1; }
 eraftpb::Snapshot RaftPeerStorage::Snapshot() {
   std::shared_ptr<eraftpb::Snapshot> snap =
       std::make_shared<eraftpb::Snapshot>();
-  snap->mutable_metadata()->set_index(this->applyState_->index());
-  snap->mutable_metadata()->set_term(this->applyState_->term());
+  snap->mutable_metadata()->set_index(
+      this->applyState_->truncated_state().index());
+  snap->mutable_metadata()->set_term(
+      this->applyState_->truncated_state().term());
   return *snap;
 }
 
@@ -203,12 +205,16 @@ std::shared_ptr<metapb::Region> RaftPeerStorage::Region() {
   return this->region_;
 }
 
-uint64_t RaftPeerStorage::TruncatedIndex() {
-  return this->applyState_->index();
-}
-
 void RaftPeerStorage::SetRegion(std::shared_ptr<metapb::Region> region) {
   this->region_ = region;
+}
+
+uint64_t RaftPeerStorage::TruncatedIndex() {
+  return this->applyState_->truncated_state().index();
+}
+
+uint64_t RaftPeerStorage::TruncatedTerm() {
+  return this->applyState_->truncated_state().term();
 }
 
 bool RaftPeerStorage::CheckRange(uint64_t low, uint64_t high) {
@@ -222,8 +228,6 @@ bool RaftPeerStorage::CheckRange(uint64_t low, uint64_t high) {
   return true;
 }
 
-uint64_t RaftPeerStorage::TruncatedTerm() { return this->applyState_->term(); }
-
 bool RaftPeerStorage::ClearMeta() { return true; }
 
 std::shared_ptr<ApplySnapResult> RaftPeerStorage::SaveReadyState(
@@ -236,8 +240,10 @@ std::shared_ptr<ApplySnapResult> RaftPeerStorage::SaveReadyState(
     this->raftState_->set_last_index(ready->snapshot.metadata().index());
     this->raftState_->set_last_term(ready->snapshot.metadata().term());
     this->applyState_->set_applied_index(ready->snapshot.metadata().index());
-    this->applyState_->set_index(ready->snapshot.metadata().index());
-    this->applyState_->set_term(ready->snapshot.metadata().term());
+    this->applyState_->mutable_truncated_state()->set_index(
+        ready->snapshot.metadata().index());
+    this->applyState_->mutable_truncated_state()->set_term(
+        ready->snapshot.metadata().term());
   }
 
   this->Append(ready->entries, this->engines_->raftDB_);

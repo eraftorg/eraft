@@ -254,8 +254,10 @@ void RaftPeerMsgHandler::HandleRaftReady() {
       auto lastEnt = rd.committedEntries[rd.committedEntries.size() - 1];
       this->peer_->peerStorage_->applyState_->set_applied_index(
           lastEnt.index());
-      this->peer_->peerStorage_->applyState_->set_index(lastEnt.index());
-      this->peer_->peerStorage_->applyState_->set_term(lastEnt.term());
+      this->peer_->peerStorage_->applyState_->mutable_truncated_state()
+          ->set_index(lastEnt.index());
+      this->peer_->peerStorage_->applyState_->mutable_truncated_state()
+          ->set_term(lastEnt.term());
       SPDLOG_INFO(
           "write to db applied index: " + std::to_string(lastEnt.index()) +
           " truncated state index: " + std::to_string(lastEnt.index()) +

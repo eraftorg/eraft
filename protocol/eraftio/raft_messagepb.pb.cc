@@ -187,10 +187,9 @@ void protobuf_AssignDesc_raft_5fmessagepb_2eproto() {
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RaftLocalState, _internal_metadata_),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RaftLocalState, _is_default_instance_));
   RaftApplyState_descriptor_ = file->message_type(3);
-  static const int RaftApplyState_offsets_[3] = {
+  static const int RaftApplyState_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RaftApplyState, applied_index_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RaftApplyState, index_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RaftApplyState, term_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RaftApplyState, truncated_state_),
   };
   RaftApplyState_reflection_ =
     ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
@@ -789,74 +788,75 @@ void protobuf_AddDesc_raft_5fmessagepb_2eproto() {
     "6\n\rraft_msg_type\030\n \001(\0162\037.raft_messagepb."
     "RaftMessageType\"_\n\016RaftLocalState\022&\n\nhar"
     "d_state\030\001 \001(\0132\022.eraftpb.HardState\022\022\n\nlas"
-    "t_index\030\002 \001(\004\022\021\n\tlast_term\030\003 \001(\004\"D\n\016Raft"
-    "ApplyState\022\025\n\rapplied_index\030\001 \001(\004\022\r\n\005ind"
-    "ex\030\002 \001(\004\022\014\n\004term\030\003 \001(\004\"1\n\022RaftTruncatedS"
-    "tate\022\r\n\005index\030\001 \001(\004\022\014\n\004term\030\002 \001(\004\"\\\n\020Reg"
-    "ionLocalState\022(\n\005state\030\001 \001(\0162\031.raft_mess"
-    "agepb.PeerState\022\036\n\006region\030\002 \001(\0132\016.metapb"
-    ".Region\"@\n\nStoreIdent\022\022\n\ncluster_id\030\001 \001("
-    "\004\022\020\n\010store_id\030\002 \001(\004\022\014\n\004addr\030\003 \001(\t\"&\n\010Key"
-    "Value\022\013\n\003key\030\001 \001(\014\022\r\n\005value\030\002 \001(\014\"%\n\nGet"
-    "Request\022\n\n\002cf\030\001 \001(\t\022\013\n\003key\030\002 \001(\014\"\034\n\013GetR"
-    "esponse\022\r\n\005value\030\001 \001(\014\"4\n\nPutRequest\022\n\n\002"
-    "cf\030\001 \001(\t\022\013\n\003key\030\002 \001(\014\022\r\n\005value\030\003 \001(\014\"\r\n\013"
-    "PutResponse\"(\n\rDeleteRequest\022\n\n\002cf\030\001 \001(\t"
-    "\022\013\n\003key\030\002 \001(\014\"\020\n\016DeleteResponse\"\265\001\n\007Requ"
-    "est\022)\n\010cmd_type\030\001 \001(\0162\027.raft_messagepb.C"
-    "mdType\022\'\n\003get\030\002 \001(\0132\032.raft_messagepb.Get"
-    "Request\022\'\n\003put\030\004 \001(\0132\032.raft_messagepb.Pu"
-    "tRequest\022-\n\006delete\030\005 \001(\0132\035.raft_messagep"
-    "b.DeleteRequest\"\271\001\n\010Response\022)\n\010cmd_type"
-    "\030\001 \001(\0162\027.raft_messagepb.CmdType\022(\n\003get\030\002"
-    " \001(\0132\033.raft_messagepb.GetResponse\022(\n\003put"
-    "\030\004 \001(\0132\033.raft_messagepb.PutResponse\022.\n\006d"
-    "elete\030\005 \001(\0132\036.raft_messagepb.DeleteRespo"
-    "nse\"]\n\021ChangePeerRequest\022,\n\013change_type\030"
-    "\001 \001(\0162\027.eraftpb.ConfChangeType\022\032\n\004peer\030\002"
-    " \001(\0132\014.metapb.Peer\"4\n\022ChangePeerResponse"
-    "\022\036\n\006region\030\001 \001(\0132\016.metapb.Region\"N\n\014Spli"
-    "tRequest\022\021\n\tsplit_key\030\001 \001(\014\022\025\n\rnew_regio"
-    "n_id\030\002 \001(\004\022\024\n\014new_peer_ids\030\003 \003(\004\"0\n\rSpli"
-    "tResponse\022\037\n\007regions\030\001 \003(\0132\016.metapb.Regi"
-    "on\"@\n\021CompactLogRequest\022\025\n\rcompact_index"
-    "\030\001 \001(\004\022\024\n\014compact_term\030\002 \001(\004\"\024\n\022CompactL"
-    "ogResponse\"3\n\025TransferLeaderRequest\022\032\n\004p"
-    "eer\030\001 \001(\0132\014.metapb.Peer\"\030\n\026TransferLeade"
-    "rResponse\"\233\002\n\014AdminRequest\022.\n\010cmd_type\030\001"
-    " \001(\0162\034.raft_messagepb.AdminCmdType\0226\n\013ch"
-    "ange_peer\030\002 \001(\0132!.raft_messagepb.ChangeP"
-    "eerRequest\0226\n\013compact_log\030\004 \001(\0132!.raft_m"
-    "essagepb.CompactLogRequest\022>\n\017transfer_l"
-    "eader\030\005 \001(\0132%.raft_messagepb.TransferLea"
-    "derRequest\022+\n\005split\030\n \001(\0132\034.raft_message"
-    "pb.SplitRequest\"\240\002\n\rAdminResponse\022.\n\010cmd"
-    "_type\030\001 \001(\0162\034.raft_messagepb.AdminCmdTyp"
-    "e\0227\n\013change_peer\030\002 \001(\0132\".raft_messagepb."
-    "ChangePeerResponse\0227\n\013compact_log\030\004 \001(\0132"
-    "\".raft_messagepb.CompactLogResponse\022\?\n\017t"
-    "ransfer_leader\030\005 \001(\0132&.raft_messagepb.Tr"
-    "ansferLeaderResponse\022,\n\005split\030\n \001(\0132\035.ra"
-    "ft_messagepb.SplitResponse\"{\n\021RaftReques"
-    "tHeader\022\021\n\tregion_id\030\001 \001(\004\022\032\n\004peer\030\002 \001(\013"
-    "2\014.metapb.Peer\022)\n\014region_epoch\030\004 \001(\0132\023.m"
-    "etapb.RegionEpoch\022\014\n\004term\030\005 \001(\004\"8\n\022RaftR"
-    "esponseHeader\022\014\n\004uuid\030\002 \001(\014\022\024\n\014current_t"
-    "erm\030\003 \001(\004\"n\n\016RaftCmdRequest\0221\n\006header\030\001 "
-    "\001(\0132!.raft_messagepb.RaftRequestHeader\022)"
-    "\n\010requests\030\002 \003(\0132\027.raft_messagepb.Reques"
-    "t\"r\n\017RaftCmdResponse\0222\n\006header\030\001 \001(\0132\".r"
-    "aft_messagepb.RaftResponseHeader\022+\n\tresp"
-    "onses\030\002 \003(\0132\030.raft_messagepb.Response*{\n"
-    "\017RaftMessageType\022\021\n\rRaftMsgNormal\020\000\022\024\n\020R"
-    "aftMsgClientCmd\020\001\022\026\n\022RaftTransferLeader\020"
-    "\002\022\022\n\016RaftConfChange\020\003\022\023\n\017RaftSplitRegion"
-    "\020\004*&\n\tPeerState\022\n\n\006Normal\020\000\022\r\n\tTombstone"
-    "\020\002*>\n\007CmdType\022\013\n\007Invalid\020\000\022\007\n\003Get\020\001\022\007\n\003P"
-    "ut\020\003\022\n\n\006Delete\020\004\022\010\n\004Snap\020\005*_\n\014AdminCmdTy"
-    "pe\022\020\n\014InvalidAdmin\020\000\022\016\n\nChangePeer\020\001\022\016\n\n"
-    "CompactLog\020\003\022\022\n\016TransferLeader\020\004\022\t\n\005Spli"
-    "t\020\nb\006proto3", 3211);
+    "t_index\030\002 \001(\004\022\021\n\tlast_term\030\003 \001(\004\"d\n\016Raft"
+    "ApplyState\022\025\n\rapplied_index\030\001 \001(\004\022;\n\017tru"
+    "ncated_state\030\002 \001(\0132\".raft_messagepb.Raft"
+    "TruncatedState\"1\n\022RaftTruncatedState\022\r\n\005"
+    "index\030\001 \001(\004\022\014\n\004term\030\002 \001(\004\"\\\n\020RegionLocal"
+    "State\022(\n\005state\030\001 \001(\0162\031.raft_messagepb.Pe"
+    "erState\022\036\n\006region\030\002 \001(\0132\016.metapb.Region\""
+    "@\n\nStoreIdent\022\022\n\ncluster_id\030\001 \001(\004\022\020\n\010sto"
+    "re_id\030\002 \001(\004\022\014\n\004addr\030\003 \001(\t\"&\n\010KeyValue\022\013\n"
+    "\003key\030\001 \001(\014\022\r\n\005value\030\002 \001(\014\"%\n\nGetRequest\022"
+    "\n\n\002cf\030\001 \001(\t\022\013\n\003key\030\002 \001(\014\"\034\n\013GetResponse\022"
+    "\r\n\005value\030\001 \001(\014\"4\n\nPutRequest\022\n\n\002cf\030\001 \001(\t"
+    "\022\013\n\003key\030\002 \001(\014\022\r\n\005value\030\003 \001(\014\"\r\n\013PutRespo"
+    "nse\"(\n\rDeleteRequest\022\n\n\002cf\030\001 \001(\t\022\013\n\003key\030"
+    "\002 \001(\014\"\020\n\016DeleteResponse\"\265\001\n\007Request\022)\n\010c"
+    "md_type\030\001 \001(\0162\027.raft_messagepb.CmdType\022\'"
+    "\n\003get\030\002 \001(\0132\032.raft_messagepb.GetRequest\022"
+    "\'\n\003put\030\004 \001(\0132\032.raft_messagepb.PutRequest"
+    "\022-\n\006delete\030\005 \001(\0132\035.raft_messagepb.Delete"
+    "Request\"\271\001\n\010Response\022)\n\010cmd_type\030\001 \001(\0162\027"
+    ".raft_messagepb.CmdType\022(\n\003get\030\002 \001(\0132\033.r"
+    "aft_messagepb.GetResponse\022(\n\003put\030\004 \001(\0132\033"
+    ".raft_messagepb.PutResponse\022.\n\006delete\030\005 "
+    "\001(\0132\036.raft_messagepb.DeleteResponse\"]\n\021C"
+    "hangePeerRequest\022,\n\013change_type\030\001 \001(\0162\027."
+    "eraftpb.ConfChangeType\022\032\n\004peer\030\002 \001(\0132\014.m"
+    "etapb.Peer\"4\n\022ChangePeerResponse\022\036\n\006regi"
+    "on\030\001 \001(\0132\016.metapb.Region\"N\n\014SplitRequest"
+    "\022\021\n\tsplit_key\030\001 \001(\014\022\025\n\rnew_region_id\030\002 \001"
+    "(\004\022\024\n\014new_peer_ids\030\003 \003(\004\"0\n\rSplitRespons"
+    "e\022\037\n\007regions\030\001 \003(\0132\016.metapb.Region\"@\n\021Co"
+    "mpactLogRequest\022\025\n\rcompact_index\030\001 \001(\004\022\024"
+    "\n\014compact_term\030\002 \001(\004\"\024\n\022CompactLogRespon"
+    "se\"3\n\025TransferLeaderRequest\022\032\n\004peer\030\001 \001("
+    "\0132\014.metapb.Peer\"\030\n\026TransferLeaderRespons"
+    "e\"\233\002\n\014AdminRequest\022.\n\010cmd_type\030\001 \001(\0162\034.r"
+    "aft_messagepb.AdminCmdType\0226\n\013change_pee"
+    "r\030\002 \001(\0132!.raft_messagepb.ChangePeerReque"
+    "st\0226\n\013compact_log\030\004 \001(\0132!.raft_messagepb"
+    ".CompactLogRequest\022>\n\017transfer_leader\030\005 "
+    "\001(\0132%.raft_messagepb.TransferLeaderReque"
+    "st\022+\n\005split\030\n \001(\0132\034.raft_messagepb.Split"
+    "Request\"\240\002\n\rAdminResponse\022.\n\010cmd_type\030\001 "
+    "\001(\0162\034.raft_messagepb.AdminCmdType\0227\n\013cha"
+    "nge_peer\030\002 \001(\0132\".raft_messagepb.ChangePe"
+    "erResponse\0227\n\013compact_log\030\004 \001(\0132\".raft_m"
+    "essagepb.CompactLogResponse\022\?\n\017transfer_"
+    "leader\030\005 \001(\0132&.raft_messagepb.TransferLe"
+    "aderResponse\022,\n\005split\030\n \001(\0132\035.raft_messa"
+    "gepb.SplitResponse\"{\n\021RaftRequestHeader\022"
+    "\021\n\tregion_id\030\001 \001(\004\022\032\n\004peer\030\002 \001(\0132\014.metap"
+    "b.Peer\022)\n\014region_epoch\030\004 \001(\0132\023.metapb.Re"
+    "gionEpoch\022\014\n\004term\030\005 \001(\004\"8\n\022RaftResponseH"
+    "eader\022\014\n\004uuid\030\002 \001(\014\022\024\n\014current_term\030\003 \001("
+    "\004\"n\n\016RaftCmdRequest\0221\n\006header\030\001 \001(\0132!.ra"
+    "ft_messagepb.RaftRequestHeader\022)\n\010reques"
+    "ts\030\002 \003(\0132\027.raft_messagepb.Request\"r\n\017Raf"
+    "tCmdResponse\0222\n\006header\030\001 \001(\0132\".raft_mess"
+    "agepb.RaftResponseHeader\022+\n\tresponses\030\002 "
+    "\003(\0132\030.raft_messagepb.Response*{\n\017RaftMes"
+    "sageType\022\021\n\rRaftMsgNormal\020\000\022\024\n\020RaftMsgCl"
+    "ientCmd\020\001\022\026\n\022RaftTransferLeader\020\002\022\022\n\016Raf"
+    "tConfChange\020\003\022\023\n\017RaftSplitRegion\020\004*&\n\tPe"
+    "erState\022\n\n\006Normal\020\000\022\r\n\tTombstone\020\002*>\n\007Cm"
+    "dType\022\013\n\007Invalid\020\000\022\007\n\003Get\020\001\022\007\n\003Put\020\003\022\n\n\006"
+    "Delete\020\004\022\010\n\004Snap\020\005*_\n\014AdminCmdType\022\020\n\014In"
+    "validAdmin\020\000\022\016\n\nChangePeer\020\001\022\016\n\nCompactL"
+    "og\020\003\022\022\n\016TransferLeader\020\004\022\t\n\005Split\020\nb\006pro"
+    "to3", 3243);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "raft_messagepb.proto", &protobuf_RegisterTypes);
   RawPutRequest::default_instance_ = new RawPutRequest();
@@ -2897,8 +2897,7 @@ void RaftLocalState::clear_last_term() {
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int RaftApplyState::kAppliedIndexFieldNumber;
-const int RaftApplyState::kIndexFieldNumber;
-const int RaftApplyState::kTermFieldNumber;
+const int RaftApplyState::kTruncatedStateFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 RaftApplyState::RaftApplyState()
@@ -2909,6 +2908,7 @@ RaftApplyState::RaftApplyState()
 
 void RaftApplyState::InitAsDefaultInstance() {
   _is_default_instance_ = true;
+  truncated_state_ = const_cast< ::raft_messagepb::RaftTruncatedState*>(&::raft_messagepb::RaftTruncatedState::default_instance());
 }
 
 RaftApplyState::RaftApplyState(const RaftApplyState& from)
@@ -2923,8 +2923,7 @@ void RaftApplyState::SharedCtor() {
     _is_default_instance_ = false;
   _cached_size_ = 0;
   applied_index_ = GOOGLE_ULONGLONG(0);
-  index_ = GOOGLE_ULONGLONG(0);
-  term_ = GOOGLE_ULONGLONG(0);
+  truncated_state_ = NULL;
 }
 
 RaftApplyState::~RaftApplyState() {
@@ -2934,6 +2933,7 @@ RaftApplyState::~RaftApplyState() {
 
 void RaftApplyState::SharedDtor() {
   if (this != default_instance_) {
+    delete truncated_state_;
   }
 }
 
@@ -2964,27 +2964,9 @@ RaftApplyState* RaftApplyState::New(::google::protobuf::Arena* arena) const {
 
 void RaftApplyState::Clear() {
 // @@protoc_insertion_point(message_clear_start:raft_messagepb.RaftApplyState)
-#if defined(__clang__)
-#define ZR_HELPER_(f) \
-  _Pragma("clang diagnostic push") \
-  _Pragma("clang diagnostic ignored \"-Winvalid-offsetof\"") \
-  __builtin_offsetof(RaftApplyState, f) \
-  _Pragma("clang diagnostic pop")
-#else
-#define ZR_HELPER_(f) reinterpret_cast<char*>(\
-  &reinterpret_cast<RaftApplyState*>(16)->f)
-#endif
-
-#define ZR_(first, last) do {\
-  ::memset(&first, 0,\
-           ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
-} while (0)
-
-  ZR_(applied_index_, term_);
-
-#undef ZR_HELPER_
-#undef ZR_
-
+  applied_index_ = GOOGLE_ULONGLONG(0);
+  if (GetArenaNoVirtual() == NULL && truncated_state_ != NULL) delete truncated_state_;
+  truncated_state_ = NULL;
 }
 
 bool RaftApplyState::MergePartialFromCodedStream(
@@ -3007,33 +2989,16 @@ bool RaftApplyState::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(16)) goto parse_index;
+        if (input->ExpectTag(18)) goto parse_truncated_state;
         break;
       }
 
-      // optional uint64 index = 2;
+      // optional .raft_messagepb.RaftTruncatedState truncated_state = 2;
       case 2: {
-        if (tag == 16) {
-         parse_index:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
-                 input, &index_)));
-
-        } else {
-          goto handle_unusual;
-        }
-        if (input->ExpectTag(24)) goto parse_term;
-        break;
-      }
-
-      // optional uint64 term = 3;
-      case 3: {
-        if (tag == 24) {
-         parse_term:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
-                 input, &term_)));
-
+        if (tag == 18) {
+         parse_truncated_state:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_truncated_state()));
         } else {
           goto handle_unusual;
         }
@@ -3070,14 +3035,10 @@ void RaftApplyState::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt64(1, this->applied_index(), output);
   }
 
-  // optional uint64 index = 2;
-  if (this->index() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt64(2, this->index(), output);
-  }
-
-  // optional uint64 term = 3;
-  if (this->term() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt64(3, this->term(), output);
+  // optional .raft_messagepb.RaftTruncatedState truncated_state = 2;
+  if (this->has_truncated_state()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      2, *this->truncated_state_, output);
   }
 
   // @@protoc_insertion_point(serialize_end:raft_messagepb.RaftApplyState)
@@ -3091,14 +3052,11 @@ void RaftApplyState::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(1, this->applied_index(), target);
   }
 
-  // optional uint64 index = 2;
-  if (this->index() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(2, this->index(), target);
-  }
-
-  // optional uint64 term = 3;
-  if (this->term() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(3, this->term(), target);
+  // optional .raft_messagepb.RaftTruncatedState truncated_state = 2;
+  if (this->has_truncated_state()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageNoVirtualToArray(
+        2, *this->truncated_state_, false, target);
   }
 
   // @@protoc_insertion_point(serialize_to_array_end:raft_messagepb.RaftApplyState)
@@ -3116,18 +3074,11 @@ int RaftApplyState::ByteSize() const {
         this->applied_index());
   }
 
-  // optional uint64 index = 2;
-  if (this->index() != 0) {
+  // optional .raft_messagepb.RaftTruncatedState truncated_state = 2;
+  if (this->has_truncated_state()) {
     total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::UInt64Size(
-        this->index());
-  }
-
-  // optional uint64 term = 3;
-  if (this->term() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::UInt64Size(
-        this->term());
+      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        *this->truncated_state_);
   }
 
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
@@ -3161,11 +3112,8 @@ void RaftApplyState::MergeFrom(const RaftApplyState& from) {
   if (from.applied_index() != 0) {
     set_applied_index(from.applied_index());
   }
-  if (from.index() != 0) {
-    set_index(from.index());
-  }
-  if (from.term() != 0) {
-    set_term(from.term());
+  if (from.has_truncated_state()) {
+    mutable_truncated_state()->::raft_messagepb::RaftTruncatedState::MergeFrom(from.truncated_state());
   }
 }
 
@@ -3194,8 +3142,7 @@ void RaftApplyState::Swap(RaftApplyState* other) {
 }
 void RaftApplyState::InternalSwap(RaftApplyState* other) {
   std::swap(applied_index_, other->applied_index_);
-  std::swap(index_, other->index_);
-  std::swap(term_, other->term_);
+  std::swap(truncated_state_, other->truncated_state_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   std::swap(_cached_size_, other->_cached_size_);
 }
@@ -3225,32 +3172,42 @@ void RaftApplyState::clear_applied_index() {
   // @@protoc_insertion_point(field_set:raft_messagepb.RaftApplyState.applied_index)
 }
 
-// optional uint64 index = 2;
-void RaftApplyState::clear_index() {
-  index_ = GOOGLE_ULONGLONG(0);
+// optional .raft_messagepb.RaftTruncatedState truncated_state = 2;
+bool RaftApplyState::has_truncated_state() const {
+  return !_is_default_instance_ && truncated_state_ != NULL;
 }
- ::google::protobuf::uint64 RaftApplyState::index() const {
-  // @@protoc_insertion_point(field_get:raft_messagepb.RaftApplyState.index)
-  return index_;
+void RaftApplyState::clear_truncated_state() {
+  if (GetArenaNoVirtual() == NULL && truncated_state_ != NULL) delete truncated_state_;
+  truncated_state_ = NULL;
 }
- void RaftApplyState::set_index(::google::protobuf::uint64 value) {
+const ::raft_messagepb::RaftTruncatedState& RaftApplyState::truncated_state() const {
+  // @@protoc_insertion_point(field_get:raft_messagepb.RaftApplyState.truncated_state)
+  return truncated_state_ != NULL ? *truncated_state_ : *default_instance_->truncated_state_;
+}
+::raft_messagepb::RaftTruncatedState* RaftApplyState::mutable_truncated_state() {
   
-  index_ = value;
-  // @@protoc_insertion_point(field_set:raft_messagepb.RaftApplyState.index)
+  if (truncated_state_ == NULL) {
+    truncated_state_ = new ::raft_messagepb::RaftTruncatedState;
+  }
+  // @@protoc_insertion_point(field_mutable:raft_messagepb.RaftApplyState.truncated_state)
+  return truncated_state_;
 }
-
-// optional uint64 term = 3;
-void RaftApplyState::clear_term() {
-  term_ = GOOGLE_ULONGLONG(0);
-}
- ::google::protobuf::uint64 RaftApplyState::term() const {
-  // @@protoc_insertion_point(field_get:raft_messagepb.RaftApplyState.term)
-  return term_;
-}
- void RaftApplyState::set_term(::google::protobuf::uint64 value) {
+::raft_messagepb::RaftTruncatedState* RaftApplyState::release_truncated_state() {
+  // @@protoc_insertion_point(field_release:raft_messagepb.RaftApplyState.truncated_state)
   
-  term_ = value;
-  // @@protoc_insertion_point(field_set:raft_messagepb.RaftApplyState.term)
+  ::raft_messagepb::RaftTruncatedState* temp = truncated_state_;
+  truncated_state_ = NULL;
+  return temp;
+}
+void RaftApplyState::set_allocated_truncated_state(::raft_messagepb::RaftTruncatedState* truncated_state) {
+  delete truncated_state_;
+  truncated_state_ = truncated_state;
+  if (truncated_state) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_set_allocated:raft_messagepb.RaftApplyState.truncated_state)
 }
 
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
