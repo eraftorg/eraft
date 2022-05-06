@@ -229,9 +229,9 @@ std::shared_ptr<storage::WriteBatch> RaftPeerMsgHandler::Process(
 void RaftPeerMsgHandler::HandleRaftReady() {
   // pop ready message, send to tran
   SPDLOG_INFO("handle raft ready " + std::to_string(this->peer_->regionId_));
-  if (this->peer_->stopped_) {
-    return;
-  }
+  // if (this->peer_->stopped_) {
+  //   return;
+  // }
   if (this->peer_->raftGroup_->HasReady()) {
     SPDLOG_INFO("raft group is ready!");
     eraft::DReady rd = this->peer_->raftGroup_->EReady();
@@ -381,9 +381,9 @@ void RaftPeerMsgHandler::OnTick() {
   SPDLOG_INFO("NODE STATE:" +
               eraft::StateToString(this->peer_->GetRaftGroup()->raft->state_));
 
-  if (this->peer_->stopped_) {
-    return;
-  }
+  // if (this->peer_->stopped_) {
+  //   return;
+  // }
 
   this->OnRaftBaseTick();
   QueueContext::GetInstance()->get_regionIdCh().enqueue(this->peer_->regionId_);
@@ -416,9 +416,9 @@ bool RaftPeerMsgHandler::OnRaftMsg(raft_messagepb::RaftMessage *msg) {
     return false;
   }
 
-  if (this->peer_->stopped_) {
-    return false;
-  }
+  // if (this->peer_->stopped_) {
+  //   return false;
+  // }
   eraftpb::Message newMsg;
   newMsg.set_from(msg->message().from());
   newMsg.set_to(msg->message().to());

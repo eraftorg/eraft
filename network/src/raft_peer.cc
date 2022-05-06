@@ -67,6 +67,7 @@ RaftPeer::RaftPeer(uint64_t storeId, std::shared_ptr<RaftConfig> cfg,
   this->peerStorage_ = ps;
   this->peerCache_ = {};
   this->tag_ = tag;
+  this->stopped_ = false;
 
   SPDLOG_INFO("init peer with peer id = " + std::to_string(this->meta_->id()) +
               " store id = " + std::to_string(this->meta_->store_id()) +

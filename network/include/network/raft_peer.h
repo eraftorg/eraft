@@ -45,6 +45,8 @@ class RaftPeer {
  public:
   RaftPeer();
 
+  ~RaftPeer() {}
+
   RaftPeer(uint64_t storeId, std::shared_ptr<RaftConfig> cfg,
            std::shared_ptr<DBEngines> dbEngines,
            std::shared_ptr<metapb::Region> region);

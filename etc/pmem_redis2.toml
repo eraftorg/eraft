@@ -1,6 +1,6 @@
 [server]
 
-addr = "172.19.0.12:20161"
+addr = "172.20.0.12:20161"
 
 logdir = "logs/tiredis.log"
 

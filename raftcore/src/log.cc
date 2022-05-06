@@ -63,6 +63,7 @@ namespace eraft
     this->applied_ = lo - 1;
     this->stabled_ = hi;
     this->firstIndex_ = lo;
+    this->commited_ = 0;
     SPDLOG_INFO("init raft log with firstIndex " +
                 std::to_string(this->firstIndex_) + " applied " +
                 std::to_string(this->applied_) + " stabled " +

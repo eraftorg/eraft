@@ -70,7 +70,7 @@ bool RaftStoreRouter::Send(uint64_t regionId, Msg m) {
 
 bool RaftStoreRouter::SendRaftMessage(const raft_messagepb::RaftMessage *msg) {
   raft_messagepb::RaftMessage *raftMsg = new raft_messagepb::RaftMessage(*msg);
-  SPDLOG_DEBUG("send raft message type " +
+  SPDLOG_INFO("send raft message type " +
                eraft::MsgTypeToString(raftMsg->message().msg_type()));
   Msg m = Msg(MsgType::MsgTypeRaftMessage, msg->region_id(), raftMsg);
   return router_->Send(msg->region_id(), m);

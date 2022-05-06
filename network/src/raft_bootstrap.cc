@@ -62,23 +62,25 @@ bool BootHelper::DoBootstrapStore(std::shared_ptr<DBEngines> engines,
                                   std::string storeAddr) {
   std::shared_ptr<raft_messagepb::StoreIdent> storeIdent(
       new raft_messagepb::StoreIdent());
-  if (!IsRangeEmpty(engines->kvDB_, "",
-                    RaftEncodeAssistant::GetInstance()->MaxKeyStr())) {
-    SPDLOG_ERROR("kv db is not empty");
-    return false;
-  }
+  // if (!IsRangeEmpty(engines->kvDB_, "",
+  //                   RaftEncodeAssistant::GetInstance()->MaxKeyStr())) {
+  //   SPDLOG_ERROR("kv db is not empty");
+  //   return false;
+  // }
 
-  if (!IsRangeEmpty(engines->raftDB_, "",
-                    RaftEncodeAssistant::GetInstance()->MaxKeyStr())) {
-  }
+  // if (!IsRangeEmpty(engines->raftDB_, "",
+  //                   RaftEncodeAssistant::GetInstance()->MaxKeyStr())) {
+  // }
 
   storeIdent->set_cluster_id(clusterId);
   storeIdent->set_store_id(storeId);
+  storeIdent->set_addr(storeAddr);
 
   if (RaftEncodeAssistant::GetInstance()->PutMessageToEngine(
           engines->kvDB_,
           RaftEncodeAssistant::GetInstance()->StoreIdentKeyStr(),
           *storeIdent) == storage::EngOpStatus::OK) {
+    SPDLOG_DEBUG("put StoreIdent key succ");
     return true;
   }
   return false;
@@ -144,6 +146,7 @@ bool BootHelper::PrepareBoostrapCluster(
   storage::WriteBatch raftWB;
   WriteInitialRaftState(raftWB, region->id());
   engines->raftDB_->PutWriteBatch(raftWB);
+  SPDLOG_DEBUG("do prepare boostrap cluster successful!");
   return true;
 }
 
@@ -166,6 +169,7 @@ void BootHelper::WriteInitialApplyState(storage::WriteBatch &kvWB,
       RaftEncodeAssistant::GetInstance()->kRaftInitLogTerm);
   applyState->set_allocated_truncated_state(truncatedState);
   std::string val = applyState->SerializeAsString();
+  SPDLOG_DEBUG("write init apply state : " + applyState->DebugString() + "to kvWB");
   kvWB.Put(RaftEncodeAssistant::GetInstance()->ApplyStateKey(regionId), val);
 }
 
@@ -180,8 +184,14 @@ void BootHelper::WriteInitialRaftState(storage::WriteBatch &raftWB,
       std::make_shared<raft_messagepb::RaftLocalState>();
   raftState->set_last_index(
       RaftEncodeAssistant::GetInstance()->kRaftInitLogIndex);
+  // TODO: set hard state
+  eraftpb::HardState* hardState = new eraftpb::HardState();
+  hardState->set_term(RaftEncodeAssistant::GetInstance()->kRaftInitLogTerm);
+  hardState->set_commit(RaftEncodeAssistant::GetInstance()->kRaftInitLogIndex);
+  raftState->set_allocated_hard_state(hardState);
   std::string val = raftState->SerializeAsString();
-  raftWB.Put(RaftEncodeAssistant::GetInstance()->ApplyStateKey(regionId), val);
+  SPDLOG_DEBUG("write init raft state : " + raftState->DebugString() + "to raftWB");
+  raftWB.Put(RaftEncodeAssistant::GetInstance()->RaftStateKey(regionId), val);
 }
 
 BootHelper *BootHelper::GetInstance() {

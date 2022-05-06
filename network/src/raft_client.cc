@@ -38,19 +38,14 @@ RaftConn::RaftConn(std::string targetAddr_) {
 RaftConn::~RaftConn() { redisFree(redisConnContext_); }
 
 bool RaftConn::Send(raft_messagepb::RaftMessage &msg, std::string cmd) {
-  if (redisConnContext_ != nullptr) {
-    std::string sendMsg = msg.SerializeAsString();
-
-    redisReply *reply = static_cast<redisReply *>(
-        redisCommand(redisConnContext_, "%s %s", cmd.c_str(), sendMsg.c_str()));
-    if (std::string(reply->str) != "OK") {
-      SPDLOG_ERROR("send raftmessage error: " + std::string(reply->str));
-      return false;
-    }
-    freeReplyObject(reply);
-  } else {
-    SPDLOG_ERROR("connect to peer error!");
+  std::string sendMsg = msg.SerializeAsString();
+  redisReply *reply = static_cast<redisReply *>(
+      redisCommand(redisConnContext_, "%s %s", cmd.c_str(), sendMsg.c_str()));
+  if (std::string(reply->str) != "OK") {
+    SPDLOG_ERROR("send raftmessage error: " + std::string(reply->str));
+    return false;
   }
+  freeReplyObject(reply);
   return true;
 }
 
@@ -71,7 +66,7 @@ std::shared_ptr<RaftConn> RaftClient::GetConn(std::string addr,
 redisContext *RaftConn::GetConnContext() { return redisConnContext_; }
 
 RaftClient::RaftClient(std::shared_ptr<RaftConfig> conf) : conf_(conf) {
-  SPDLOG_DEBUG("init raft client.");
+  SPDLOG_INFO("init raft client.");
 }
 
 RaftClient::~RaftClient() {}

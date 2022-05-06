@@ -281,6 +281,7 @@ void RaftContext::Tick() {
 
 void RaftContext::TickElection() {
   this->electionElapsed_++;
+  SPDLOG_INFO("election elapsed -> " + std::to_string(this->electionElapsed_));
   if (this->electionElapsed_ >=
       this->randomElectionTimeout_) {  // election timeout
     SPDLOG_INFO("election timeout");
