@@ -12,13 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-default: meta_server block_server wellwood-ctl dashboard
+default: meta_server block_server wellwood-ctl dashboard rds_server
 
 meta_server:
 	go build -o output/meta_server cmd/meta-server/main.go
 
 block_server:
 	go build -o output/block_server cmd/block-server/main.go
+
+rds_server:
+	go build -o output/rds_server cmd/rds-server/main.go
 
 wellwood-ctl:
 	go build -o output/wellwood-ctl cmd/sdk-ctl/main.go
