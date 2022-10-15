@@ -21,29 +21,9 @@ enum ErrCode {
     GET_OBJECT_META_FROM_ENG_ERR = 13;
     WRITE_FILE_BLOCK_ERR = 14;
     READ_FILE_BLOCK_ERR = 15;
-}
-
-message BucketOpRequest {
-  string bucket_name = 1;
-  string bucket_id = 2;
-  Object object = 3;
-}
-
-message BucketOpResponse {
-  repeated Bucket buckets = 1;
-  repeated Object objects = 2;
-}
-
-message Bucket {
-  string bucket_id = 1;
-  string bucket_name = 2;
-}
-
-message Object {
-  string object_id = 1;
-  string object_name = 2;
-  string from_bucket_id = 3;
-  repeated FileBlockMeta object_blocks_meta = 4;
+    KEY_NOT_EXISTS_ERR = 16;
+    WRITE_TO_DB_ERR = 17;
+    UNEXPECT_ERR = 18;
 }
 
 enum ConfigServerGroupMetaOpType {
@@ -63,7 +43,6 @@ message ServerGroupMetaConfigRequest {
    repeated int64 gids = 2;
    int64 config_version = 3;
    ConfigServerGroupMetaOpType op_type = 4;
-   BucketOpRequest bucket_op_req = 5;
 }
 
 message ServerGroupMetas {
@@ -76,12 +55,6 @@ message ServerGroupMetaConfigResponse {
     ErrCode err_code = 1;
     ServerGroupMetas server_group_metas = 2;
     int64 leader_id = 3;
-    BucketOpResponse bucket_op_res = 4;
-}
-
-message FileBlockMeta {
-    int64 block_id = 1;
-    int64 block_slot_id = 2;
 }
 
 // for meta service
@@ -90,26 +63,29 @@ service MetaService {
     rpc ServerGroupMeta (ServerGroupMetaConfigRequest) returns (ServerGroupMetaConfigResponse);
 }
 
-enum FileBlockOpType { 
-   OP_BLOCK_READ = 0;
-   OP_BLOCK_WRITE = 1;
+// op type for ekvserver
+enum OpType {
+  OP_PUT = 0;
+  OP_APPEND = 1;
+  OP_GET = 2;
+  OP_SCAN = 3;
 }
 
-message FileBlockOpRequest {
-    string file_name = 1;
-    FileBlockMeta file_blocks_meta = 2;
-    bytes block_content = 3;
-    FileBlockOpType op_type = 4;
-    string object_id = 5;
+message EkvCommandRequest {
+  string key = 1;
+  string val = 2;
+  OpType op_type = 3;
+  string cmd_token = 4;
+  int64  client_id = 5;
+  bytes  context = 6;
 }
 
-message FileBlockOpResponse {
-    ErrCode err_code = 1;
-    int64 leader_id = 2;
-    bytes block_content = 3;
+message EkvCommandResponse {
+  string val = 1;
+  int64  leader_id = 2;
+  int64  err_code = 3;
 }
 
-// for block server deal with file block read write
-service FileBlockService {
-    rpc FileBlockOp (FileBlockOpRequest) returns (FileBlockOpResponse) {}
+service EkvService {
+  rpc DoCommand (EkvCommandRequest) returns (EkvCommandResponse);
 }

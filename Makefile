@@ -12,19 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-default: meta_server block_server wellwood-ctl dashboard
+default: ekv-server
 
-meta_server:
-	go build -o output/meta_server cmd/meta-server/main.go
-
-block_server:
-	go build -o output/block_server cmd/block-server/main.go
-
-wellwood-ctl:
-	go build -o output/wellwood-ctl cmd/sdk-ctl/main.go
-
-dashboard:
-	go build -o output/dashboard cmd/dashboard/main.go
+ekv-server:
+	go build -o output/ekv-server cmd/ekv-server/main.go
 
 clean:
 	rm -rf output/*

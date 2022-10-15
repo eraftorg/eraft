@@ -106,86 +106,86 @@ var MetaService_ServiceDesc = grpc.ServiceDesc{
 	Metadata: "wellwood.proto",
 }
 
-// FileBlockServiceClient is the client API for FileBlockService service.
+// EkvServiceClient is the client API for EkvService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type FileBlockServiceClient interface {
-	FileBlockOp(ctx context.Context, in *FileBlockOpRequest, opts ...grpc.CallOption) (*FileBlockOpResponse, error)
+type EkvServiceClient interface {
+	DoCommand(ctx context.Context, in *EkvCommandRequest, opts ...grpc.CallOption) (*EkvCommandResponse, error)
 }
 
-type fileBlockServiceClient struct {
+type ekvServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewFileBlockServiceClient(cc grpc.ClientConnInterface) FileBlockServiceClient {
-	return &fileBlockServiceClient{cc}
+func NewEkvServiceClient(cc grpc.ClientConnInterface) EkvServiceClient {
+	return &ekvServiceClient{cc}
 }
 
-func (c *fileBlockServiceClient) FileBlockOp(ctx context.Context, in *FileBlockOpRequest, opts ...grpc.CallOption) (*FileBlockOpResponse, error) {
-	out := new(FileBlockOpResponse)
-	err := c.cc.Invoke(ctx, "/protocol.FileBlockService/FileBlockOp", in, out, opts...)
+func (c *ekvServiceClient) DoCommand(ctx context.Context, in *EkvCommandRequest, opts ...grpc.CallOption) (*EkvCommandResponse, error) {
+	out := new(EkvCommandResponse)
+	err := c.cc.Invoke(ctx, "/protocol.EkvService/DoCommand", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// FileBlockServiceServer is the server API for FileBlockService service.
-// All implementations must embed UnimplementedFileBlockServiceServer
+// EkvServiceServer is the server API for EkvService service.
+// All implementations must embed UnimplementedEkvServiceServer
 // for forward compatibility
-type FileBlockServiceServer interface {
-	FileBlockOp(context.Context, *FileBlockOpRequest) (*FileBlockOpResponse, error)
-	mustEmbedUnimplementedFileBlockServiceServer()
+type EkvServiceServer interface {
+	DoCommand(context.Context, *EkvCommandRequest) (*EkvCommandResponse, error)
+	mustEmbedUnimplementedEkvServiceServer()
 }
 
-// UnimplementedFileBlockServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedFileBlockServiceServer struct {
+// UnimplementedEkvServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedEkvServiceServer struct {
 }
 
-func (UnimplementedFileBlockServiceServer) FileBlockOp(context.Context, *FileBlockOpRequest) (*FileBlockOpResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method FileBlockOp not implemented")
+func (UnimplementedEkvServiceServer) DoCommand(context.Context, *EkvCommandRequest) (*EkvCommandResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DoCommand not implemented")
 }
-func (UnimplementedFileBlockServiceServer) mustEmbedUnimplementedFileBlockServiceServer() {}
+func (UnimplementedEkvServiceServer) mustEmbedUnimplementedEkvServiceServer() {}
 
-// UnsafeFileBlockServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to FileBlockServiceServer will
+// UnsafeEkvServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to EkvServiceServer will
 // result in compilation errors.
-type UnsafeFileBlockServiceServer interface {
-	mustEmbedUnimplementedFileBlockServiceServer()
+type UnsafeEkvServiceServer interface {
+	mustEmbedUnimplementedEkvServiceServer()
 }
 
-func RegisterFileBlockServiceServer(s grpc.ServiceRegistrar, srv FileBlockServiceServer) {
-	s.RegisterService(&FileBlockService_ServiceDesc, srv)
+func RegisterEkvServiceServer(s grpc.ServiceRegistrar, srv EkvServiceServer) {
+	s.RegisterService(&EkvService_ServiceDesc, srv)
 }
 
-func _FileBlockService_FileBlockOp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(FileBlockOpRequest)
+func _EkvService_DoCommand_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EkvCommandRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(FileBlockServiceServer).FileBlockOp(ctx, in)
+		return srv.(EkvServiceServer).DoCommand(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/protocol.FileBlockService/FileBlockOp",
+		FullMethod: "/protocol.EkvService/DoCommand",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FileBlockServiceServer).FileBlockOp(ctx, req.(*FileBlockOpRequest))
+		return srv.(EkvServiceServer).DoCommand(ctx, req.(*EkvCommandRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// FileBlockService_ServiceDesc is the grpc.ServiceDesc for FileBlockService service.
+// EkvService_ServiceDesc is the grpc.ServiceDesc for EkvService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var FileBlockService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "protocol.FileBlockService",
-	HandlerType: (*FileBlockServiceServer)(nil),
+var EkvService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "protocol.EkvService",
+	HandlerType: (*EkvServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "FileBlockOp",
-			Handler:    _FileBlockService_FileBlockOp_Handler,
+			MethodName: "DoCommand",
+			Handler:    _EkvService_DoCommand_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
